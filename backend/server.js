@@ -9,8 +9,11 @@ const app = express();
 // Connect Database
 connectDB();
 
+const path = require('path');
+
 // Init Middleware
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Enable CORS
 app.use(cors({
@@ -21,7 +24,7 @@ app.use(cors({
 // Rate Limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    max: 10000, // Limit each IP to 10000 requests per `window` (here, per 15 minutes)
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
@@ -33,6 +36,12 @@ app.get('/api/health', (req, res) => {
     res.json({ status: "Backend connected successfully" });
 });
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/dashboard', require('./routes/statsRoutes'));
+app.use('/api/documents', require('./routes/documentRoutes'));
+app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/tasks', require('./routes/taskMessageRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/team', require('./routes/teamRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

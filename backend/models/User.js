@@ -20,6 +20,19 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'Please provide a password'],
         minlength: 8
     },
+    role: {
+        type: String,
+        enum: ['manager', 'member'],
+        default: 'manager'
+    },
+    managerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    phone: {
+        type: String,
+        trim: true
+    },
     isVerified: {
         type: Boolean,
         default: false

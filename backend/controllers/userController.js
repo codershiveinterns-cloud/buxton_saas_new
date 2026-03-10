@@ -1,9 +1,10 @@
 const User = require('../models/User');
+const TeamMember = require('../models/TeamMember');
 
 exports.getUsers = async (req, res) => {
     try {
         const workspaceId = req.user.role === 'manager' ? req.user.id : req.user.managerId;
-        const users = await User.find({ managerId: workspaceId, role: 'member' }).select('-password -verificationToken').sort({ createdAt: -1 });
+        const users = await TeamMember.find({ managerId: workspaceId, role: 'member' }).sort({ createdAt: -1 });
         res.json(users);
     } catch (err) {
         console.error(err.message);
@@ -13,39 +14,43 @@ exports.getUsers = async (req, res) => {
 
 exports.createUser = async (req, res) => {
     try {
-        if (req.user.role !== 'manager') {
-            return res.status(403).json({ message: 'Only managers can add team members' });
-        }
-
-        const { name, email, password, role, phone } = req.body;
+        const { name, email, role, phone, firebaseUid } = req.body;
         
-        if(!name || !email || !password) {
-            return res.status(400).json({ message: 'Name, email, and password are required' });
+        if(!name || !email) {
+            return res.status(400).json({ message: 'Name and email are required' });
         }
 
+        // 1. Maintain global identity so they can log in
         let user = await User.findOne({ email });
-        if (user) return res.status(400).json({ message: 'User already exists' });
+        if (!user) {
+            user = new User({ 
+                name, 
+                email, 
+                role: 'member', 
+                phone,
+                managerId: req.user.id, // Primary context
+                firebaseUid: firebaseUid || undefined
+            });
+            await user.save();
+        }
 
-        const bcrypt = require('bcrypt');
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        // 2. Map relation to this specific manager/team
+        let teamMember = await TeamMember.findOne({ email, managerId: req.user.id });
+        if (!teamMember) {
+            teamMember = new TeamMember({
+                name, 
+                email, 
+                role: role || 'member', 
+                phone,
+                managerId: req.user.id
+            });
+            await teamMember.save();
+        }
 
-        // Assign managerId to the req.user.id who is creating this member
-        user = new User({ 
-            name, 
-            email, 
-            password: hashedPassword, 
-            role: role || 'member', 
-            phone,
-            managerId: req.user.id
-        });
-        await user.save();
-        
-        user.password = undefined; // Do not return password
         res.status(201).json({ 
             success: true, 
             message: 'Team member added successfully', 
-            user 
+            user: teamMember 
         });
     } catch (err) {
         console.error(err.message);
@@ -55,10 +60,10 @@ exports.createUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
-        await user.deleteOne();
-        res.json({ message: 'User removed' });
+        const teamMember = await TeamMember.findById(req.params.id);
+        if (!teamMember) return res.status(404).json({ message: 'Member not found in team' });
+        await teamMember.deleteOne();
+        res.json({ message: 'Member removed from team' });
     } catch (err) {
         console.error(err.message);
         if (err.kind === 'ObjectId') {

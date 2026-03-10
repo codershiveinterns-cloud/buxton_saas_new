@@ -16,9 +16,12 @@ const UserSchema = new mongoose.Schema({
         match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'Please provide a valid email']
     },
     password: {
+        type: String, // Temporarily stored for legacy purposes or Manager invites
+        required: false
+    },
+    firebaseUid: {
         type: String,
-        required: [true, 'Please provide a password'],
-        minlength: 8
+        required: false
     },
     role: {
         type: String,

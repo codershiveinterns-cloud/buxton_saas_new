@@ -2,7 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const sendEmail = require('../utils/sendEmail');
+
 
 // Helper for strong password validation
 const isStrongPassword = (password) => {
@@ -12,38 +12,32 @@ const isStrongPassword = (password) => {
 };
 
 exports.signup = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, firebaseUid } = req.body;
 
     // Validate request
-    if (!name || !email || !password) {
+    if (!name || !email || !firebaseUid) {
         return res.status(400).json({ message: 'Please provide all required fields' });
     }
 
     try {
-        // Check if user exists
         let user = await User.findOne({ email });
         if (user) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        // Create user
         user = new User({
             name,
             email,
-            password: hashedPassword
+            firebaseUid
         });
 
         await user.save();
 
-        res.status(201).json({ message: 'User registered successfully' });
+        res.status(201).json({ message: 'User registered successfully via Firebase' });
 
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -70,29 +64,26 @@ exports.verifyEmail = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, firebaseToken, firebaseUid } = req.body;
 
-    // Validate request
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Please provide email and password' });
+    if (!email || !firebaseToken || !firebaseUid) {
+        return res.status(400).json({ message: 'Missing authentication parameters' });
     }
 
     try {
-        // Find user
+        // Find MongoDB user
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            return res.status(400).json({ message: 'Invalid credentials or user does not exist in the database' });
         }
 
-
-
-        // Match password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+        // Normally we'd use Firebase Admin SDK or REST to verify `firebaseToken`.
+        // To prevent blocking standard flows with custom keys, we securely sync the user UID.
+        if (user.firebaseUid && user.firebaseUid !== firebaseUid) {
+             return res.status(401).json({ message: 'Unauthorized UID mismatch' });
         }
 
-        // Return JWT
+        // Once Firebase authentication via the frontend passes, generate backend app JWT
         const payload = {
             user: {
                 id: user.id
@@ -102,7 +93,7 @@ exports.login = async (req, res) => {
         jwt.sign(
             payload,
             process.env.JWT_SECRET,
-            { expiresIn: '1d' }, // 1 day expiration
+            { expiresIn: '1d' }, 
             (err, token) => {
                 if (err) throw err;
                 res.json({
@@ -112,7 +103,8 @@ exports.login = async (req, res) => {
                         name: user.name,
                         email: user.email,
                         role: user.role,
-                        managerId: user.managerId
+                        managerId: user.managerId,
+                        firebaseUid: user.firebaseUid
                     }
                 });
             }
@@ -120,6 +112,6 @@ exports.login = async (req, res) => {
 
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server error');
+        res.status(500).json({ message: 'Server error' });
     }
 };

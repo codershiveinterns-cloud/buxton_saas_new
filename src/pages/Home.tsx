@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -20,6 +21,8 @@ import FAQ from '../components/FAQ';
 import Newsletter from '../components/Newsletter';
 
 export default function Home() {
+  const [isYearly, setIsYearly] = useState(false);
+
   const features = [
     {
       icon: Shield,
@@ -89,7 +92,9 @@ export default function Home() {
   const pricingPlans = [
     {
       name: 'Starter',
-      price: '$29',
+      price: isYearly ? '$278' : '$29',
+      originalPrice: isYearly ? '$348' : undefined,
+      period: isYearly ? '/year' : '/month',
       description: 'Perfect for small teams getting started',
       features: [
         'Up to 5 team members',
@@ -101,7 +106,9 @@ export default function Home() {
     },
     {
       name: 'Professional',
-      price: '$79',
+      price: isYearly ? '$758' : '$79',
+      originalPrice: isYearly ? '$948' : undefined,
+      period: isYearly ? '/year' : '/month',
       description: 'For growing teams with advanced needs',
       features: [
         'Up to 20 team members',
@@ -116,7 +123,7 @@ export default function Home() {
     {
       name: 'Enterprise',
       price: 'Custom',
-      description: 'For large organizations',
+      description: isYearly ? 'Custom pricing with yearly contract' : 'For large organizations',
       features: [
         'Unlimited team members',
         'Enterprise analytics',
@@ -211,10 +218,31 @@ export default function Home() {
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               Simple, transparent pricing
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
               Choose the plan that works best for your team. All plans include
               a 14-day free trial.
             </p>
+            <div className="flex items-center justify-center gap-3">
+              <span className={`text-sm font-medium ${!isYearly ? 'text-gray-900' : 'text-gray-500'}`}>Monthly</span>
+              <button
+                type="button"
+                className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-900 transition-colors duration-200 ease-in-out focus:outline-none"
+                role="switch"
+                aria-checked={isYearly}
+                onClick={() => setIsYearly(!isYearly)}
+              >
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isYearly ? 'translate-x-5' : 'translate-x-0'}`}
+                />
+              </button>
+              <div className="flex items-center gap-2">
+                <span className={`text-sm font-medium ${isYearly ? 'text-gray-900' : 'text-gray-500'}`}>Yearly</span>
+                <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                  Save 20%
+                </span>
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {pricingPlans.map((plan, index) => (

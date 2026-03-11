@@ -2,6 +2,9 @@ import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Hammer, Eye, EyeOff, Loader2 } from 'lucide-react';
 
+import toast from 'react-hot-toast';
+import { authService } from '../services/authService';
+
 export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -35,7 +38,7 @@ export default function Login() {
     return isValid;
   };
 
-  const isFormValid = formData.email && formData.password && validateForm;
+  const isFormValid = formData.email && formData.password;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -44,20 +47,23 @@ export default function Login() {
       setErrors((prev) => ({ ...prev, general: '' }));
 
       try {
-        await new Promise((resolve, reject) => {
-          setTimeout(() => {
-            if (formData.email !== 'test@example.com' || formData.password !== 'Password123!') {
-              reject(new Error('Incorrect login credentials'));
-            } else {
-              resolve(true);
-            }
-          }, 1500);
-        });
-        
+        await authService.loginUser(formData.email, formData.password);
+        toast.success('Logged in successfully!');
         navigate('/dashboard');
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      } catch (err: any) {
+        let errorMessage = err.response?.data?.message || err.message || 'Login failed';
+        
+        if (err.message === 'NOT_VERIFIED') {
+          errorMessage = 'Please verify your email before accessing the dashboard.';
+        } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+          errorMessage = 'Invalid email or password.';
+        }
+        
         setErrors((prev) => ({ ...prev, general: errorMessage }));
+        toast.error(errorMessage);
+        if (err.code || err.message) {
+           authService.logout().catch(() => {});
+        }
       } finally {
         setIsLoading(false);
       }
@@ -166,12 +172,12 @@ export default function Login() {
                 </label>
               </div>
 
-              <a
-                href="#"
+              <Link
+                to="/forgot-password"
                 className="text-sm font-medium text-gray-900 hover:text-gray-700"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <button

@@ -12,13 +12,25 @@ import {
 export default function Sidebar() {
   const location = useLocation();
 
-  const menuItems = [
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const isManager = user?.role !== 'member';
+
+  const managerItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { icon: FileText, label: 'Documents', path: '/dashboard' },
-    { icon: CheckSquare, label: 'Tasks', path: '/dashboard' },
-    { icon: Users, label: 'Team', path: '/dashboard' },
-    { icon: Settings, label: 'Settings', path: '/dashboard' },
+    { icon: FileText, label: 'Documents', path: '/documents' },
+    { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
+    { icon: Users, label: 'Team', path: '/team' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
   ];
+
+  const memberItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: CheckSquare, label: 'My Tasks', path: '/tasks' },
+    { icon: Settings, label: 'Profile', path: '/settings' },
+  ];
+
+  const menuItems = isManager ? managerItems : memberItems;
 
   return (
     <div className="w-64 bg-gray-50 border-r border-gray-200 h-screen flex flex-col">

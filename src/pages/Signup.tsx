@@ -1,9 +1,13 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Hammer } from 'lucide-react';
+import { Hammer, Loader2, Eye, EyeOff } from 'lucide-react';
+
+import toast from 'react-hot-toast';
+import { authService } from '../services/authService';
 
 export default function Signup() {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,7 +19,11 @@ export default function Signup() {
     email: '',
     password: '',
     confirmPassword: '',
+    general: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateForm = () => {
     const newErrors = {
@@ -23,11 +31,15 @@ export default function Signup() {
       email: '',
       password: '',
       confirmPassword: '',
+      general: '',
     };
     let isValid = true;
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
+      isValid = false;
+    } else if (!/^[A-Za-z\s]+$/.test(formData.name)) {
+      newErrors.name = 'Full name must contain only letters';
       isValid = false;
     }
 
@@ -42,9 +54,12 @@ export default function Signup() {
     if (!formData.password) {
       newErrors.password = 'Password is required';
       isValid = false;
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-      isValid = false;
+    } else {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      if (!passwordRegex.test(formData.password)) {
+        newErrors.password = 'Password must contain 8 characters, uppercase, lowercase, number and special character';
+        isValid = false;
+      }
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -56,16 +71,42 @@ export default function Signup() {
     return isValid;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      navigate('/dashboard');
+      setIsLoading(true);
+      setErrors((prev) => ({ ...prev, general: '' }));
+
+      try {
+        await authService.registerUser(formData.email, formData.password, formData.name);
+        toast.success('Signup successful! Please verify your email.');
+        
+        // Navigate back to login, asking them to verify their email
+        navigate('/login');
+      } catch (err: any) {
+        let errorMessage = err.response?.data?.message || err.message || 'Signup failed';
+        if (err.code === 'auth/email-already-in-use') {
+          errorMessage = 'Email is already in use by another account.';
+        }
+        setErrors((prev) => ({ ...prev, general: errorMessage }));
+        toast.error(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    
+    // Prevent numbers or special characters in the Full Name input field
+    if (name === 'name') {
+      value = value.replace(/[^A-Za-z\s]/g, '');
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Real-time validation clear
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -89,6 +130,12 @@ export default function Signup() {
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-8">
+          {errors.general && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 font-medium">
+              {errors.general}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
@@ -141,16 +188,25 @@ export default function Signup() {
               >
                 Password
               </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors ${errors.password ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                placeholder="Create a password (min. 8 characters)"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors pr-12 ${errors.password ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  placeholder="Create a password (min. 8 characters)"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
               )}
@@ -163,16 +219,25 @@ export default function Signup() {
               >
                 Confirm password
               </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                placeholder="Confirm your password"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors pr-12 ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  placeholder="Confirm your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-600">
                   {errors.confirmPassword}
@@ -182,9 +247,13 @@ export default function Signup() {
 
             <button
               type="submit"
-              className="w-full bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+              disabled={isLoading}
+              className={`w-full flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white transition-colors ${
+                isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'
+              }`}
             >
-              Create account
+              {isLoading && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
+              {isLoading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 

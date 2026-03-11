@@ -3,6 +3,8 @@ import { Check } from 'lucide-react';
 interface PricingCardProps {
   name: string;
   price: string;
+  originalPrice?: string;
+  period?: string;
   description: string;
   features: string[];
   popular?: boolean;
@@ -11,6 +13,8 @@ interface PricingCardProps {
 export default function PricingCard({
   name,
   price,
+  originalPrice,
+  period,
   description,
   features,
   popular = false,
@@ -30,12 +34,15 @@ export default function PricingCard({
           </span>
         </div>
       )}
-      <div className="mb-6">
+      <div className="mb-6 h-[88px]">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">{name}</h3>
         <div className="flex items-baseline mb-2">
           <span className="text-4xl font-bold text-gray-900">{price}</span>
+          {originalPrice && (
+            <span className="text-xl text-gray-400 line-through ml-2">{originalPrice}</span>
+          )}
           {price !== 'Custom' && (
-            <span className="text-gray-600 ml-2">/month</span>
+            <span className="text-gray-600 ml-2">{period || '/month'}</span>
           )}
         </div>
         <p className="text-gray-600 text-sm">{description}</p>

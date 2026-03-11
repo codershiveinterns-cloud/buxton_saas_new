@@ -44,6 +44,15 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    status: {
+        type: String,
+        enum: ['invited', 'active'],
+        default: 'active'
+    },
+    inviteToken: {
+        type: String,
+        required: false
+    },
     createdAt: {
         type: Date,
         default: Date.now

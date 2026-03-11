@@ -12,9 +12,11 @@ exports.getUsers = async (req, res) => {
     }
 };
 
+const crypto = require('crypto');
+
 exports.createUser = async (req, res) => {
     try {
-        const { name, email, role, phone, firebaseUid } = req.body;
+        const { name, email, role, phone } = req.body;
         
         if(!name || !email) {
             return res.status(400).json({ message: 'Name and email are required' });
@@ -29,9 +31,13 @@ exports.createUser = async (req, res) => {
                 role: 'member', 
                 phone,
                 managerId: req.user.id, // Primary context
-                firebaseUid: firebaseUid || undefined
+                status: 'invited'
             });
             await user.save();
+        } else if (user.status === 'invited') {
+             // Just resend or acknowledge it's still pending
+        } else {
+             return res.status(400).json({ message: 'User already exists and is active' });
         }
 
         // 2. Map relation to this specific manager/team
@@ -42,14 +48,18 @@ exports.createUser = async (req, res) => {
                 email, 
                 role: role || 'member', 
                 phone,
-                managerId: req.user.id
+                managerId: req.user.id,
+                status: 'invited'
             });
             await teamMember.save();
         }
 
+        // Could add an emailer code here like `sendEmail(email, "You have been invited!")`
+        console.log(`\n\n[System] Invitation silently processed for ${email}\n\n`);
+
         res.status(201).json({ 
             success: true, 
-            message: 'Team member added successfully', 
+            message: 'Team member invited successfully', 
             user: teamMember 
         });
     } catch (err) {

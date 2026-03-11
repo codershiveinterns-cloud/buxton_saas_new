@@ -22,6 +22,11 @@ const TeamMemberSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team' // Assuming there is or will be a Team logic, otherwise just generic
     },
+    status: {
+        type: String,
+        enum: ['invited', 'active'],
+        default: 'active'
+    },
     joinedAt: {
         type: Date,
         default: Date.now

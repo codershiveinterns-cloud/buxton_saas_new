@@ -31,7 +31,9 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // Define Routes
-app.get('/', (req, res) => res.send('API Running'));
+app.get('/', (req, res) => {
+    res.send('BUXTON Backend API Running');
+});
 app.get('/api/health', (req, res) => {
     res.json({ status: "Backend connected successfully" });
 });
@@ -42,7 +44,13 @@ app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/tasks', require('./routes/taskMessageRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/team', require('./routes/teamRoutes'));
+app.use('/api/activities', require('./routes/activityRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+    console.log('---');
+    console.log('Server running successfully');
+    console.log(`Backend API: http://localhost:${PORT}`);
+    console.log('Frontend App: http://localhost:5173');
+});

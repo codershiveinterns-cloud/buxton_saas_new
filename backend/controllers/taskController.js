@@ -1,4 +1,6 @@
 const Task = require('../models/Task');
+const Activity = require('../models/Activity');
+const User = require('../models/User');
 
 exports.createTask = async (req, res) => {
     try {
@@ -33,6 +35,16 @@ exports.getTasks = async (req, res) => {
     }
 };
 
+exports.getMyTasks = async (req, res) => {
+    try {
+        const tasks = await Task.find({ assignedTo: req.user.id }).sort({ createdAt: -1 });
+        res.json(tasks);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 exports.updateTask = async (req, res) => {
     try {
         if (req.user.role !== 'manager') {
@@ -56,8 +68,23 @@ exports.updateTaskStatus = async (req, res) => {
             return res.status(403).json({ message: 'You can only update tasks assigned to you' });
         }
         
+        const previousStatus = task.status;
         task.status = req.body.status;
         await task.save();
+
+        if (previousStatus !== 'completed' && req.body.status === 'completed') {
+            const user = await User.findById(req.user.id);
+            const userName = user ? user.name.split(' ')[0] : 'Unknown';
+            
+            const activity = new Activity({
+                userId: req.user.id,
+                managerId: req.user.role === 'manager' ? req.user.id : req.user.managerId,
+                message: `Task Completed: ${task.title} – by ${userName}`,
+                type: 'task_completed'
+            });
+            await activity.save();
+        }
+
         res.json(task);
     } catch (err) {
         console.error(err.message);

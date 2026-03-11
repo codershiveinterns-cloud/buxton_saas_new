@@ -22,19 +22,72 @@ exports.signup = async (req, res) => {
     try {
         let user = await User.findOne({ email });
         if (user) {
+            if (user.status === 'invited') {
+                // Feature 4: Automatically join them to the workspace and flip to active
+                user.status = 'active';
+                user.firebaseUid = firebaseUid;
+                user.name = name;
+                await user.save();
+                
+                // Update their specific TeamMember relationship status
+                const TeamMember = require('../models/TeamMember');
+                await TeamMember.updateMany(
+                    { email: user.email, status: 'invited' },
+                    { $set: { status: 'active', name: user.name } }
+                );
+
+                return res.status(201).json({ message: 'Invitation accepted and User registered successfully' });
+            }
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        // Brand new user (Manager or individual user)
         user = new User({
             name,
             email,
-            firebaseUid
+            firebaseUid,
+            status: 'active'
         });
 
         await user.save();
 
         res.status(201).json({ message: 'User registered successfully via Firebase' });
 
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.acceptInvite = async (req, res) => {
+    const { inviteToken, firebaseUid, name } = req.body;
+
+    if (!inviteToken || !firebaseUid) {
+        return res.status(400).json({ message: 'Missing invite token or authentication parameters' });
+    }
+
+    try {
+        const user = await User.findOne({ inviteToken, status: 'invited' });
+        
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired invitation token' });
+        }
+
+        // Activate the User document
+        user.status = 'active';
+        user.inviteToken = undefined;
+        user.firebaseUid = firebaseUid;
+        if (name) user.name = name; // Update name to what they signed up with
+        await user.save();
+
+        // Also activate their specific TeamMember relationship
+        const TeamMember = require('../models/TeamMember');
+        await TeamMember.updateMany(
+            { email: user.email, status: 'invited' },
+            { $set: { status: 'active', name: user.name } }
+        );
+
+        res.status(200).json({ message: 'Invitation accepted and account activated successfully' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Server error' });

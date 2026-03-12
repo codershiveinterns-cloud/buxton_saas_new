@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api', // Backend server port
+    baseURL: 'https://buxton-saas-new.onrender.com/api', // Backend server port
     headers: {
         'Content-Type': 'application/json',
     },

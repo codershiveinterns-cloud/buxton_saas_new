@@ -1,7 +1,7 @@
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  sendEmailVerification, 
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
   sendPasswordResetEmail,
   signOut
 } from 'firebase/auth';
@@ -12,9 +12,9 @@ export const authService = {
   async registerUser(email: string, password: string, name: string) {
     // 1. Firebase Auth Registration
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    
+
     // 2. Send Email Verification
-    const actionCodeSettings = { url: 'http://localhost:5173/login' };
+    const actionCodeSettings = { url: 'https://buxton-saas-new.vercel.app/login' };
     await sendEmailVerification(userCredential.user, actionCodeSettings);
 
     // 3. Keep MongoDB in sync (Auto-joins workspaces if invited)
@@ -22,7 +22,7 @@ export const authService = {
       name,
       email,
       firebaseUid: userCredential.user.uid,
-      password 
+      password
     });
 
     return { userCredential, response };
@@ -45,7 +45,7 @@ export const authService = {
       firebaseToken,
       firebaseUid: userCredential.user.uid
     });
-    
+
     // Save token to localStorage
     localStorage.setItem('token', response.data.token);
     localStorage.setItem('user', JSON.stringify(response.data.user));

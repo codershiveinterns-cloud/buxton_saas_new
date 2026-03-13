@@ -17,7 +17,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Enable CORS
 app.use(cors({
-    origin: "https://buxton-saas-new.vercel.app",
+    origin: [
+        "http://localhost:5173",
+        "https://buxton-saas-new.vercel.app"
+    ],
     credentials: true
 }));
 // Rate Limiting

@@ -3,16 +3,16 @@ export default function ProductPreview() {
     <div className="py-24 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 relative z-10">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-gray-800 sm:text-4xl">
             See How Buxton Workspace Works
           </h2>
-          <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="mt-4 text-xl text-gray-500 max-w-2xl mx-auto">
             Experience the intuitively designed interface that makes managing
             documents, tasks, and teams easier than ever.
           </p>
         </div>
 
-        <div className="relative mx-auto w-full rounded-2xl shadow-2xl lg:max-w-5xl overflow-hidden mt-12 ring-1 ring-gray-900/5 bg-gray-50 aspect-video group transition-transform duration-500 hover:scale-[1.01]">
+        <div className="relative mx-auto w-full rounded-2xl shadow-2xl lg:max-w-5xl overflow-hidden mt-12 ring-1 ring-indigo-600/5 bg-gray-50 aspect-video group transition-transform duration-500 hover:scale-[1.01]">
           {/* Faux browser header */}
           <div className="bg-gray-100 flex items-center px-4 py-3 border-b border-gray-200">
             <div className="flex space-x-2">

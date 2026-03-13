@@ -34,8 +34,8 @@ export default function TestimonialCard({
           className="w-12 h-12 rounded-full object-cover mr-4 ring-2 ring-gray-50"
         />
         <div>
-          <p className="font-semibold text-gray-900">{author}</p>
-          <p className="text-sm text-gray-600">
+          <p className="font-semibold text-gray-800">{author}</p>
+          <p className="text-sm text-gray-500">
             {role}, {company}
           </p>
         </div>

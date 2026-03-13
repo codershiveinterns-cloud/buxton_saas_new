@@ -112,23 +112,23 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen bg-[#F6F3EE] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center justify-center mb-6">
-            <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-[#2563EB] rounded-xl flex items-center justify-center">
               <Hammer className="w-7 h-7 text-white" />
             </div>
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold text-[#1F2937] mb-2">
             Create your account
           </h2>
-          <p className="text-gray-600">
+          <p className="text-[#6B7280]">
             Start managing your scaffolding projects today
           </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-8">
+        <div className="bg-white rounded-xl border border-[#E5DED6] p-8">
           {errors.general && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 font-medium">
               {errors.general}
@@ -139,7 +139,7 @@ export default function Signup() {
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-900 mb-2"
+                className="block text-sm font-medium text-[#1F2937] mb-2"
               >
                 Full name
               </label>
@@ -149,7 +149,7 @@ export default function Signup() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors ${errors.name ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB] transition-colors ${errors.name ? 'border-red-500' : 'border-[#E5DED6]'
                   }`}
                 placeholder="John Doe"
               />
@@ -161,7 +161,7 @@ export default function Signup() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-900 mb-2"
+                className="block text-sm font-medium text-[#1F2937] mb-2"
               >
                 Email address
               </label>
@@ -171,7 +171,7 @@ export default function Signup() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors ${errors.email ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB] transition-colors ${errors.email ? 'border-red-500' : 'border-[#E5DED6]'
                   }`}
                 placeholder="you@example.com"
               />
@@ -204,7 +204,7 @@ export default function Signup() {
               type="submit"
               disabled={isLoading}
               className={`w-full flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white transition-colors ${
-                isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'
+                isLoading ? 'bg-[#E5DED6] cursor-not-allowed text-[#6B7280]' : 'bg-[#2563EB] hover:bg-[#1D4ED8] shadow-sm'
               }`}
             >
               {isLoading && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
@@ -213,11 +213,11 @@ export default function Signup() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[#6B7280]">
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="font-medium text-gray-900 hover:text-gray-700"
+                className="font-medium text-[#1F2937] hover:text-[#2563EB] transition-colors"
               >
                 Sign in
               </Link>
@@ -226,13 +226,13 @@ export default function Signup() {
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-[#6B7280]">
             By creating an account, you agree to our{' '}
-            <Link to="/policy" className="text-gray-900 hover:text-gray-700">
+            <Link to="/policy" className="text-[#1F2937] hover:text-[#2563EB]">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/policy" className="text-gray-900 hover:text-gray-700">
+            <Link to="/policy" className="text-[#1F2937] hover:text-[#2563EB]">
               Privacy Policy
             </Link>
           </p>
@@ -241,7 +241,7 @@ export default function Signup() {
         <div className="mt-6 text-center">
           <Link
             to="/"
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="text-sm text-[#6B7280] hover:text-[#1F2937] transition-colors"
           >
             ← Back to home
           </Link>

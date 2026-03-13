@@ -136,31 +136,34 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F6F3EE]">
       <Navbar />
 
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 tracking-tight">
+      <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Subtle radial gradients for premium depth */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-[#E5DED6] blur-[120px] rounded-full pointer-events-none -z-10" />
+
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1F2937] mb-6 tracking-tight">
             Scaffolding Management
             <br />
-            <span className="text-gray-600">Made Simple</span>
+            <span className="text-indigo-600">Made Simple</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-[#6B7280] mb-10 max-w-3xl mx-auto leading-relaxed">
             The modern platform for construction teams to manage scaffolding
             projects, ensure safety compliance, and collaborate seamlessly.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/signup"
-              className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors group"
+              className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white bg-[#2563EB] rounded-lg hover:bg-[#1D4ED8] shadow-sm transition-colors group"
             >
               Get Started Free
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               to="/about"
-              className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-indigo-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
             >
               Learn More
             </Link>
@@ -169,7 +172,7 @@ export default function Home() {
       </section>
 
       <Statistics />
-      
+
       <Workflow />
 
       <ProductPreview />
@@ -177,10 +180,10 @@ export default function Home() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-[#1F2937] mb-4">
               Everything you need
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
               Powerful features to streamline your scaffolding operations and
               boost team productivity.
             </p>
@@ -193,13 +196,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#EFE9E1]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-[#1F2937] mb-4">
               Trusted by teams worldwide
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
               See what our customers have to say about their experience with
               BUXTON.
             </p>
@@ -215,18 +218,18 @@ export default function Home() {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-[#1F2937] mb-4">
               Simple, transparent pricing
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+            <p className="text-xl text-[#6B7280] max-w-2xl mx-auto mb-8">
               Choose the plan that works best for your team. All plans include
               a 14-day free trial.
             </p>
             <div className="flex items-center justify-center gap-3">
-              <span className={`text-sm font-medium ${!isYearly ? 'text-gray-900' : 'text-gray-500'}`}>Monthly</span>
+              <span className={`text-sm font-medium ${!isYearly ? 'text-[#1F2937]' : 'text-[#6B7280]'}`}>Monthly</span>
               <button
                 type="button"
-                className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-900 transition-colors duration-200 ease-in-out focus:outline-none"
+                className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-[#2563EB] transition-colors duration-200 ease-in-out focus:outline-none"
                 role="switch"
                 aria-checked={isYearly}
                 onClick={() => setIsYearly(!isYearly)}
@@ -237,8 +240,8 @@ export default function Home() {
                 />
               </button>
               <div className="flex items-center gap-2">
-                <span className={`text-sm font-medium ${isYearly ? 'text-gray-900' : 'text-gray-500'}`}>Yearly</span>
-                <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                <span className={`text-sm font-medium ${isYearly ? 'text-[#1F2937]' : 'text-[#6B7280]'}`}>Yearly</span>
+                <span className="inline-flex items-center rounded-full bg-[#EFE9E1] px-2 py-0.5 text-xs font-medium text-[#1F2937] ring-1 ring-[#E5DED6]">
                   Save 20%
                 </span>
               </div>

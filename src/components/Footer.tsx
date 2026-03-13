@@ -8,32 +8,32 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 lg:gap-8">
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-2 mb-6">
-              <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
                 <Hammer className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900 tracking-tight">
+              <span className="text-xl font-bold text-gray-800 tracking-tight">
                 BUXTON SCAFFOLDING
               </span>
             </div>
-            <p className="text-base text-gray-600 mb-8 max-w-sm leading-relaxed">
+            <p className="text-base text-gray-500 mb-8 max-w-sm leading-relaxed">
               The modern workspace for construction teams to organize documents, manage projects, and collaborate.
             </p>
             <div className="flex space-x-5">
               <a
                 href="#"
-                className="text-gray-400 hover:text-gray-900 transition-colors"
+                className="text-gray-400 hover:text-gray-800 transition-colors"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-gray-900 transition-colors"
+                className="text-gray-400 hover:text-gray-800 transition-colors"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-gray-900 transition-colors"
+                className="text-gray-400 hover:text-gray-800 transition-colors"
               >
                 <Github className="w-5 h-5" />
               </a>
@@ -41,14 +41,14 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase mb-6">
+            <h3 className="text-sm font-bold text-gray-800 tracking-wider uppercase mb-6">
               Product
             </h3>
             <ul className="space-y-4">
               <li>
                 <Link
                   to="/"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Features
                 </Link>
@@ -56,7 +56,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Pricing
                 </Link>
@@ -65,14 +65,14 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase mb-6">
+            <h3 className="text-sm font-bold text-gray-800 tracking-wider uppercase mb-6">
               Company
             </h3>
             <ul className="space-y-4">
               <li>
                 <Link
                   to="/about"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   About
                 </Link>
@@ -80,7 +80,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/contact"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Careers
                 </Link>
@@ -89,14 +89,14 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase mb-6">
+            <h3 className="text-sm font-bold text-gray-800 tracking-wider uppercase mb-6">
               Resources
             </h3>
             <ul className="space-y-4">
               <li>
                 <Link
                   to="/"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Blog
                 </Link>
@@ -104,7 +104,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/contact"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Help Center
                 </Link>
@@ -113,14 +113,14 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase mb-6">
+            <h3 className="text-sm font-bold text-gray-800 tracking-wider uppercase mb-6">
               Legal
             </h3>
             <ul className="space-y-4">
               <li>
                 <Link
                   to="/terms"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Terms & Conditions
                 </Link>
@@ -128,7 +128,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/policy"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Privacy Policy
                 </Link>
@@ -136,7 +136,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/refund"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Refund Policy
                 </Link>
@@ -144,7 +144,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/cookies"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Cookie Policy
                 </Link>
@@ -152,7 +152,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/security"
-                  className="text-base text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Security
                 </Link>

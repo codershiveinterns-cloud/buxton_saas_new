@@ -2,7 +2,7 @@ export default function Newsletter() {
   return (
     <div className="bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div className="bg-gray-900 rounded-3xl py-12 px-6 sm:py-16 sm:px-12 lg:flex lg:items-center lg:p-20 border border-gray-800 shadow-2xl overflow-hidden relative">
+        <div className="bg-indigo-600 rounded-3xl py-12 px-6 sm:py-16 sm:px-12 lg:flex lg:items-center lg:p-20 border border-gray-800 shadow-2xl overflow-hidden relative">
           
           <div className="lg:w-0 lg:flex-1 relative z-10">
             <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
@@ -30,7 +30,7 @@ export default function Newsletter() {
               <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-white transition-colors duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
+                  className="w-full flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-800 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-white transition-colors duration-200 hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
                 >
                   Subscribe
                 </button>

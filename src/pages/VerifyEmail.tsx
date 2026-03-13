@@ -35,11 +35,11 @@ export default function VerifyEmail() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center justify-center mb-6">
-            <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
               <Hammer className="w-7 h-7 text-white" />
             </div>
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
             Email Verification
           </h2>
         </div>
@@ -47,19 +47,19 @@ export default function VerifyEmail() {
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center shadow-sm">
           {status === 'loading' && (
             <div className="flex flex-col items-center justify-center py-6 block w-full">
-              <Loader2 className="h-12 w-12 text-gray-900 animate-spin mb-4" />
-              <p className="text-gray-600 font-medium">Verifying your email...</p>
+              <Loader2 className="h-12 w-12 text-gray-800 animate-spin mb-4" />
+              <p className="text-gray-500 font-medium">Verifying your email...</p>
             </div>
           )}
 
           {status === 'success' && (
             <div className="flex flex-col items-center justify-center py-6 w-full">
               <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
-              <p className="text-gray-900 font-medium text-lg mb-2">Verified!</p>
-              <p className="text-gray-600 mb-6">{message}</p>
+              <p className="text-gray-800 font-medium text-lg mb-2">Verified!</p>
+              <p className="text-gray-500 mb-6">{message}</p>
               <Link
                 to="/login"
-                className="w-full bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+                className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
                 style={{ display: 'block' }}
               >
                 Go to Login
@@ -70,11 +70,11 @@ export default function VerifyEmail() {
           {status === 'error' && (
             <div className="flex flex-col items-center justify-center py-6 w-full">
               <XCircle className="h-16 w-16 text-red-500 mb-4" />
-              <p className="text-gray-900 font-medium text-lg mb-2">Verification Failed</p>
+              <p className="text-gray-800 font-medium text-lg mb-2">Verification Failed</p>
               <p className="text-red-600 mb-6">{message}</p>
               <Link
                 to="/signup"
-                className="w-full bg-gray-100 text-gray-900 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                className="w-full bg-gray-100 text-gray-800 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-200 transition-colors"
                style={{ display: 'block' }}
               >
                 Back to Signup

@@ -35,10 +35,10 @@ export default function FAQ() {
     <div className="py-24 bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-gray-800 sm:text-4xl">
             Frequently Asked Questions
           </h2>
-          <p className="mt-4 text-xl text-gray-600">
+          <p className="mt-4 text-xl text-gray-500">
             Everything you need to know about the product and billing.
           </p>
         </div>
@@ -49,11 +49,11 @@ export default function FAQ() {
               className="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200"
             >
               <button
-                className="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-opacity-50"
+                className="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-opacity-50"
                 onClick={() => toggleFAQ(index)}
                 aria-expanded={openIndex === index}
               >
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-gray-800">
                   {faq.question}
                 </span>
                 {openIndex === index ? (
@@ -67,7 +67,7 @@ export default function FAQ() {
                   openIndex === index ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <div className="px-6 pb-5 text-gray-600 leading-relaxed">
+                <div className="px-6 pb-5 text-gray-500 leading-relaxed">
                   {faq.answer}
                 </div>
               </div>

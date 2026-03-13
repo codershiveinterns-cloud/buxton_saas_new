@@ -223,7 +223,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#F6F3EE]">
       <Sidebar />
 
       <div className="flex-1 overflow-auto">
@@ -234,10 +234,10 @@ export default function Dashboard() {
         ) : (
           <div className="p-8">
             <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-[#1F2937] mb-2">
               Welcome back, {user?.name ? user.name.split(' ')[0] : 'User'}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-[#6B7280]">
               Here's what's happening with your projects today.
             </p>
           </div>
@@ -248,65 +248,65 @@ export default function Dashboard() {
               return (
                 <div
                   key={index}
-                  className="bg-white rounded-xl border border-gray-200 p-6"
+                  className="bg-white rounded-xl border border-[#E5DED6] p-6 shadow-sm"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-gray-900" />
+                    <div className="w-10 h-10 bg-[#EFE9E1] rounded-lg flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-[#1F2937]" />
                     </div>
                     <span className="text-sm font-medium text-green-600">
                       {stat.trend}
                     </span>
                   </div>
-                  <p className="text-2xl font-bold text-gray-900 mb-1">
+                  <p className="text-2xl font-bold text-[#1F2937] mb-1">
                     {stat.value}
                   </p>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
+                  <p className="text-sm text-[#6B7280]">{stat.label}</p>
                 </div>
               );
             })}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
               <div className="flex items-center justify-between mb-6">
                 <Link to="/documents" className="hover:opacity-70 transition-opacity">
-                  <h2 className="text-lg font-semibold text-gray-900 cursor-pointer">
+                  <h2 className="text-lg font-semibold text-[#1F2937] cursor-pointer">
                     Recent Documents
                   </h2>
                 </Link>
                 <button
                   onClick={() => setIsDocModalOpen(true)} 
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[#EFE9E1] rounded-lg transition-colors"
                 >
-                  <Plus className="w-5 h-5 text-gray-600" />
+                  <Plus className="w-5 h-5 text-[#6B7280]" />
                 </button>
               </div>
               <div className="space-y-4">
                 {recentDocuments.length === 0 ? (
-                  <p className="text-sm text-gray-500">No documents found.</p>
+                  <p className="text-sm text-[#6B7280]">No documents found.</p>
                 ) : (
                   recentDocuments.map((doc, index) => (
                     <div
                       key={index}
-                      className="flex items-start justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                      className="flex items-start justify-between p-3 hover:bg-[#EFE9E1] rounded-lg transition-colors cursor-pointer"
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <FileText className="w-5 h-5 text-gray-600" />
+                        <div className="w-10 h-10 bg-[#EFE9E1] rounded-lg flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-5 h-5 text-[#6B7280]" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900 text-sm">
+                          <p className="font-medium text-[#1F2937] text-sm">
                             {doc.title}
                           </p>
-                          <p className="text-xs text-gray-500">{new Date(doc.createdAt).toLocaleDateString()}</p>
+                          <p className="text-xs text-[#6B7280]">{new Date(doc.createdAt).toLocaleDateString()}</p>
                         </div>
                       </div>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
                           doc.status === 'Published'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-700'
+                            ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
+                            : 'bg-gray-50 text-gray-700 ring-1 ring-gray-600/20'
                         }`}
                       >
                         {doc.status}
@@ -317,45 +317,45 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
               <div className="flex items-center justify-between mb-6">
                 <Link to="/tasks" className="hover:opacity-70 transition-opacity">
-                  <h2 className="text-lg font-semibold text-gray-900 cursor-pointer">
+                  <h2 className="text-lg font-semibold text-[#1F2937] cursor-pointer">
                     Active Tasks
                   </h2>
                 </Link>
                 <button 
                   onClick={() => setIsTaskModalOpen(true)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-[#EFE9E1] rounded-lg transition-colors"
                 >
-                  <Plus className="w-5 h-5 text-gray-600" />
+                  <Plus className="w-5 h-5 text-[#6B7280]" />
                 </button>
               </div>
               <div className="space-y-3">
                 {tasks.length === 0 ? (
-                  <p className="text-sm text-gray-500">No tasks found.</p>
+                  <p className="text-sm text-[#6B7280]">No tasks found.</p>
                 ) : (
                   tasks.map((task, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                      className="flex items-center justify-between p-3 hover:bg-[#EFE9E1] rounded-lg transition-colors cursor-pointer"
                     >
                       <div className="flex items-center space-x-3">
                         <input
                           type="checkbox"
                           checked={false}
                           onChange={() => handleTaskCompletion(task._id)}
-                          className="w-4 h-4 rounded border-gray-300 cursor-pointer text-gray-900 focus:ring-gray-900"
+                          className="w-4 h-4 rounded border-[#E5DED6] cursor-pointer text-[#1F2937] focus:ring-[#2563EB]"
                         />
-                        <span className="text-sm text-gray-900">{task.title}</span>
+                        <span className="text-sm text-[#1F2937]">{task.title}</span>
                       </div>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
                           task.priority === 'High'
-                            ? 'bg-red-100 text-red-700'
+                            ? 'bg-red-50 text-red-700 ring-1 ring-red-600/20'
                             : task.priority === 'Medium'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-gray-100 text-gray-700'
+                            ? 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20'
+                            : 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
                         }`}
                       >
                         {task.priority}
@@ -367,31 +367,31 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-[#1F2937]">
                 Recent Team Activity
               </h2>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <MoreVertical className="w-5 h-5 text-gray-600" />
+              <button className="p-2 hover:bg-[#EFE9E1] rounded-lg transition-colors">
+                <MoreVertical className="w-5 h-5 text-[#6B7280]" />
               </button>
             </div>
             <div className="space-y-4">
               {activities.length === 0 ? (
-                <p className="text-sm text-gray-500">No recent activity.</p>
+                <p className="text-sm text-[#6B7280]">No recent activity.</p>
               ) : (
                 activities.map((activity, index) => (
                   <div key={index} className="flex items-start space-x-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-gray-600 font-semibold text-sm">
+                    <div className="w-10 h-10 bg-[#EFE9E1] rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-[#6B7280] font-semibold text-sm">
                         {activity.user && typeof activity.user === 'string' ? activity.user.charAt(0).toUpperCase() : '?'}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-[#1F2937]">
                         {activity.message}
                       </p>
-                      <p className="text-xs text-gray-500">{activity.time}</p>
+                      <p className="text-xs text-[#6B7280]">{activity.time}</p>
                     </div>
                   </div>
                 ))
@@ -405,28 +405,28 @@ export default function Dashboard() {
       {isTaskModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Create New Task</h2>
+            <h2 className="text-xl font-bold text-[#1F2937] mb-4">Create New Task</h2>
             <form onSubmit={handleCreateTask} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Task Title</label>
-                <input type="text" required value={taskTitle} onChange={(e) => setTaskTitle(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 outline-none" />
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Task Title</label>
+                <input type="text" required value={taskTitle} onChange={(e) => setTaskTitle(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea value={taskDescription} onChange={(e) => setTaskDescription(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 outline-none" rows={3} />
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Description</label>
+                <textarea value={taskDescription} onChange={(e) => setTaskDescription(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none" rows={3} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                  <select value={taskPriority} onChange={(e) => setTaskPriority(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 outline-none">
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Priority</label>
+                  <select value={taskPriority} onChange={(e) => setTaskPriority(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none">
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
                     <option value="High">High</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
-                  <select value={taskAssignedTo} onChange={(e) => setTaskAssignedTo(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 outline-none" required>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Assign To</label>
+                  <select value={taskAssignedTo} onChange={(e) => setTaskAssignedTo(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none" required>
                     {teamMembers.map(m => (
                       <option key={m._id} value={m._id}>{m.name}</option>
                     ))}
@@ -434,12 +434,12 @@ export default function Dashboard() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                <input type="date" required value={taskDueDate} onChange={(e) => setTaskDueDate(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 outline-none" />
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Due Date</label>
+                <input type="date" required value={taskDueDate} onChange={(e) => setTaskDueDate(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none" />
               </div>
               <div className="flex justify-end gap-3 mt-6">
-                <button type="button" onClick={() => setIsTaskModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-gray-900 text-white hover:bg-gray-800 rounded-lg">Create Task</button>
+                <button type="button" onClick={() => setIsTaskModalOpen(false)} className="px-4 py-2 text-[#6B7280] hover:bg-[#EFE9E1] rounded-lg">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-[#2563EB] text-white hover:bg-[#1D4ED8] rounded-lg">Create Task</button>
               </div>
             </form>
           </div>
@@ -449,26 +449,26 @@ export default function Dashboard() {
       {isDocModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Upload Document</h2>
+            <h2 className="text-xl font-bold text-[#1F2937] mb-4">Upload Document</h2>
             <form onSubmit={handleUploadDocument} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Document Title</label>
-                <input type="text" required value={docTitle} onChange={(e) => setDocTitle(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 outline-none" />
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Document Title</label>
+                <input type="text" required value={docTitle} onChange={(e) => setDocTitle(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Upload File</label>
-                <input type="file" required onChange={(e) => setDocFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 outline-none" />
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Upload File</label>
+                <input type="file" required onChange={(e) => setDocFile(e.target.files?.[0] || null)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select value={docStatus} onChange={(e) => setDocStatus(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gray-900 outline-none">
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Status</label>
+                <select value={docStatus} onChange={(e) => setDocStatus(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none">
                   <option value="Draft">Draft</option>
                   <option value="Published">Published</option>
                 </select>
               </div>
               <div className="flex justify-end gap-3 mt-6">
-                <button type="button" onClick={() => setIsDocModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-gray-900 text-white hover:bg-gray-800 rounded-lg">Upload</button>
+                <button type="button" onClick={() => setIsDocModalOpen(false)} className="px-4 py-2 text-[#6B7280] hover:bg-[#EFE9E1] rounded-lg">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-[#2563EB] text-white hover:bg-[#1D4ED8] rounded-lg">Upload</button>
               </div>
             </form>
           </div>

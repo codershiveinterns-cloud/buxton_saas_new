@@ -74,10 +74,10 @@ export default function Contact() {
 
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl font-bold text-gray-800 mb-6">
             Get in Touch
           </h1>
-          <p className="text-xl text-gray-600 leading-relaxed">
+          <p className="text-xl text-gray-500 leading-relaxed">
             Have questions? We'd love to hear from you. Send us a message and
             we'll respond as soon as possible.
           </p>
@@ -89,7 +89,7 @@ export default function Contact() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl border border-gray-200 p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">
                   Send us a message
                 </h2>
 
@@ -105,7 +105,7 @@ export default function Contact() {
                   <div>
                     <label
                       htmlFor="name"
-                      className="block text-sm font-medium text-gray-900 mb-2"
+                      className="block text-sm font-medium text-gray-800 mb-2"
                     >
                       Name
                     </label>
@@ -115,7 +115,7 @@ export default function Contact() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors ${errors.name
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-colors ${errors.name
                           ? 'border-red-500'
                           : 'border-gray-300'
                         }`}
@@ -129,7 +129,7 @@ export default function Contact() {
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-gray-900 mb-2"
+                      className="block text-sm font-medium text-gray-800 mb-2"
                     >
                       Email
                     </label>
@@ -139,7 +139,7 @@ export default function Contact() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors ${errors.email
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-colors ${errors.email
                           ? 'border-red-500'
                           : 'border-gray-300'
                         }`}
@@ -155,7 +155,7 @@ export default function Contact() {
                   <div>
                     <label
                       htmlFor="message"
-                      className="block text-sm font-medium text-gray-900 mb-2"
+                      className="block text-sm font-medium text-gray-800 mb-2"
                     >
                       Message
                     </label>
@@ -165,7 +165,7 @@ export default function Contact() {
                       value={formData.message}
                       onChange={handleChange}
                       rows={6}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors resize-none ${errors.message
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-colors resize-none ${errors.message
                           ? 'border-red-500'
                           : 'border-gray-300'
                         }`}
@@ -180,7 +180,7 @@ export default function Contact() {
 
                   <button
                     type="submit"
-                    className="w-full bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center"
+                    className="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center"
                   >
                     <Send className="w-5 h-5 mr-2" />
                     Send Message
@@ -192,32 +192,32 @@ export default function Contact() {
             <div className="space-y-6">
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                  <Mail className="w-6 h-6 text-gray-900" />
+                  <Mail className="w-6 h-6 text-gray-800" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   Email
                 </h3>
-                <p className="text-gray-600">info@buxtonscaffolding.com</p>
+                <p className="text-gray-500">info@buxtonscaffolding.com</p>
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                  <Phone className="w-6 h-6 text-gray-900" />
+                  <Phone className="w-6 h-6 text-gray-800" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   Phone
                 </h3>
-                <p className="text-gray-600">+44 20 1234 5678</p>
+                <p className="text-gray-500">+44 20 1234 5678</p>
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-6">
                 <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                  <MapPin className="w-6 h-6 text-gray-900" />
+                  <MapPin className="w-6 h-6 text-gray-800" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-800 mb-2">
                   Company Address
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-500">
                   27 Kinder Way
                   <br />
                   Fairfield

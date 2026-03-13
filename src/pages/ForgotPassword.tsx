@@ -42,12 +42,12 @@ export default function ForgotPassword() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center justify-center mb-6">
-            <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
               <Hammer className="w-7 h-7 text-white" />
             </div>
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h2>
-          <p className="text-gray-600">Enter your email to receive a reset link</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Reset Password</h2>
+          <p className="text-gray-500">Enter your email to receive a reset link</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
@@ -56,20 +56,20 @@ export default function ForgotPassword() {
               <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 font-medium">
                 Password reset link has been sent to your email. Please check your inbox.
               </div>
-              <Link to="/login" className="w-full flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white bg-gray-900 hover:bg-gray-800 transition-colors">
+              <Link to="/login" className="w-full flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
                 Return to Login
               </Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2">Email address</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-800 mb-2">Email address</label>
                 <input
                   type="email"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:border-gray-900 focus:ring-gray-900 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:border-indigo-600 focus:ring-indigo-600 transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
@@ -78,7 +78,7 @@ export default function ForgotPassword() {
                 type="submit"
                 disabled={isLoading || !email}
                 className={`w-full flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white transition-colors ${
-                  isLoading || !email ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'
+                  isLoading || !email ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
                 }`}
               >
                 {isLoading && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
@@ -88,7 +88,7 @@ export default function ForgotPassword() {
           )}
 
           <div className="mt-6 text-center">
-            <Link to="/login" className="text-sm font-medium text-gray-900 hover:text-gray-700">
+            <Link to="/login" className="text-sm font-medium text-gray-800 hover:text-gray-700">
               Wait, I remember my password!
             </Link>
           </div>

@@ -24,18 +24,17 @@ export default function Navbar() {
   ];
 
   return (
-    <nav 
-      className={`fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md transition-all duration-300 ${
-        scrolled ? 'shadow-sm border-b border-gray-100' : 'border-b border-transparent'
-      }`}
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 bg-[#F6F3EE]/80 backdrop-blur-md transition-all duration-300 ${scrolled ? 'shadow-sm border-b border-[#E5DED6]' : 'border-b border-transparent'
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center group-hover:bg-gray-800 transition-colors">
+            <div className="w-8 h-8 bg-[#2563EB] rounded-lg flex items-center justify-center group-hover:bg-[#1D4ED8] transition-colors">
               <Hammer className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900">
+            <span className="text-xl font-semibold text-[#1F2937]">
               BUXTON SCAFFOLDING
             </span>
           </Link>
@@ -45,11 +44,10 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(link.path)
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive(link.path)
+                    ? 'bg-[#EFE9E1] text-[#1F2937]'
+                    : 'text-[#6B7280] hover:text-[#1F2937] hover:bg-[#EFE9E1]'
+                  }`}
               >
                 {link.label}
               </Link>
@@ -59,13 +57,13 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-3">
             <Link
               to="/login"
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[#1F2937] transition-colors"
             >
               Log in
             </Link>
             <Link
               to="/signup"
-              className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-[#2563EB] rounded-lg hover:bg-[#1D4ED8] shadow-sm transition-colors"
             >
               Get Started
             </Link>
@@ -73,7 +71,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+            className="md:hidden p-2 rounded-lg text-[#6B7280] hover:text-[#1F2937] hover:bg-[#EFE9E1]"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -81,18 +79,17 @@ export default function Navbar() {
       </div>
 
       {isOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white">
+        <div className="md:hidden border-t border-[#E5DED6] bg-[#F6F3EE]">
           <div className="px-4 py-3 space-y-1">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsOpen(false)}
-                className={`block px-4 py-2 rounded-lg text-sm font-medium ${
-                  isActive(link.path)
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`block px-4 py-2 rounded-lg text-sm font-medium ${isActive(link.path)
+                    ? 'bg-[#EFE9E1] text-[#1F2937]'
+                    : 'text-[#6B7280] hover:text-[#1F2937] hover:bg-[#EFE9E1]'
+                  }`}
               >
                 {link.label}
               </Link>
@@ -100,14 +97,14 @@ export default function Navbar() {
             <Link
               to="/login"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+              className="block px-4 py-2 rounded-lg text-sm font-medium text-[#6B7280] hover:bg-[#EFE9E1] hover:text-[#1F2937]"
             >
               Log in
             </Link>
             <Link
               to="/signup"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-2 rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 text-center"
+              className="block px-4 py-2 rounded-lg text-sm font-medium text-white bg-[#2563EB] hover:bg-[#1D4ED8] shadow-sm text-center"
             >
               Get Started
             </Link>

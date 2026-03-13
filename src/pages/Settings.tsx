@@ -71,90 +71,90 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#F6F3EE]">
       <Sidebar />
       <div className="flex-1 overflow-auto">
         <div className="p-8 max-w-4xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-            <p className="text-gray-600">Manage your profile, security, and preferences.</p>
+            <h1 className="text-3xl font-bold text-[#1F2937] mb-2">Settings</h1>
+            <p className="text-[#6B7280]">Manage your profile, security, and preferences.</p>
           </div>
 
           <div className="space-y-8">
             {/* Profile Settings */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Profile Information</h2>
+            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#1F2937] mb-4">Profile Information</h2>
               <form onSubmit={handleUpdateProfile} className="space-y-4 max-w-lg">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Full Name</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none"
+                    className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address (Cannot change)</label>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Email Address (Cannot change)</label>
                   <input
                     type="email"
                     value={email}
                     disabled
-                    className="w-full px-4 py-2 border border-gray-300 bg-gray-50 rounded-lg outline-none text-gray-500 cursor-not-allowed"
+                    className="w-full px-4 py-2 border border-[#E5DED6] bg-[#EFE9E1] rounded-lg outline-none text-[#6B7280] cursor-not-allowed"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Phone Number</label>
                   <input
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none"
+                    className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
                   />
                 </div>
-                <button type="submit" className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
+                <button type="submit" className="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors shadow-sm">
                   Save Changes
                 </button>
               </form>
             </div>
 
             {/* Password Settings */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Security</h2>
+            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#1F2937] mb-4">Security</h2>
               <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-lg">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Current Password</label>
                   <input
                     type="password"
                     required
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none"
+                    className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">New Password</label>
                   <input
                     type="password"
                     required
                     minLength={8}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none"
+                    className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Confirm New Password</label>
                   <input
                     type="password"
                     required
                     minLength={8}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none"
+                    className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
                   />
                 </div>
-                <button type="submit" className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
+                <button type="submit" className="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors shadow-sm">
                   Update Password
                 </button>
               </form>
@@ -162,28 +162,28 @@ export default function Settings() {
 
             {/* Company Options - Managers Only */}
             {isManager && (
-              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Company Details</h2>
+              <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
+                <h2 className="text-xl font-bold text-[#1F2937] mb-4">Company Details</h2>
                 <form onSubmit={handleUpdateCompany} className="space-y-4 max-w-lg">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                    <label className="block text-sm font-medium text-[#1F2937] mb-1">Company Name</label>
                     <input
                       type="text"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none"
+                      className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">HQ Address</label>
+                    <label className="block text-sm font-medium text-[#1F2937] mb-1">HQ Address</label>
                     <input
                       type="text"
                       value={companyAddress}
                       onChange={(e) => setCompanyAddress(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900 outline-none"
+                      className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
                     />
                   </div>
-                  <button type="submit" className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors">
+                  <button type="submit" className="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors shadow-sm">
                     Update Company Info
                   </button>
                 </form>

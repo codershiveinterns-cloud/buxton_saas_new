@@ -71,29 +71,29 @@ export default function Login() {
   };
 
   const getInputStatusClass = (value: string, error: string) => {
-    if (!value) return 'border-gray-300 focus:border-gray-900 ring-gray-900';
+    if (!value) return 'border-[#E5DED6] focus:border-[#2563EB] ring-[#2563EB]';
     if (error) return 'border-red-500 focus:border-red-500 ring-red-500';
     return 'border-green-500 focus:border-green-500 ring-green-500';
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#F6F3EE] flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center justify-center mb-6">
-            <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-[#2563EB] rounded-xl flex items-center justify-center">
               <Hammer className="w-7 h-7 text-white" />
             </div>
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl font-bold text-[#1F2937] mb-2">
             Welcome back
           </h2>
-          <p className="text-gray-600">
+          <p className="text-[#6B7280]">
             Sign in to your BUXTON account to continue
           </p>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm">
+        <div className="bg-white rounded-xl border border-[#E5DED6] p-8 shadow-sm">
           {errors.general && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 font-medium">
               {errors.general}
@@ -104,7 +104,7 @@ export default function Login() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-900 mb-2"
+                className="block text-sm font-medium text-[#1F2937] mb-2"
               >
                 Email address
               </label>
@@ -128,7 +128,7 @@ export default function Login() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-900 mb-2"
+                className="block text-sm font-medium text-[#1F2937] mb-2"
               >
                 Password
               </label>
@@ -140,13 +140,13 @@ export default function Login() {
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 pr-12 transition-colors ${formData.password ? 'border-green-500 focus:border-green-500 ring-green-500' : 'border-gray-300 focus:border-gray-900 ring-gray-900'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 pr-12 transition-colors ${formData.password ? 'border-green-500 focus:border-green-500 ring-green-500' : 'border-[#E5DED6] focus:border-[#2563EB] ring-[#2563EB]'}`}
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#1F2937] focus:outline-none"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -162,11 +162,11 @@ export default function Login() {
                   onChange={(e) =>
                     setFormData({ ...formData, remember: e.target.checked })
                   }
-                  className="w-4 h-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
+                  className="w-4 h-4 text-[#2563EB] border-[#E5DED6] rounded focus:ring-[#2563EB]"
                 />
                 <label
                   htmlFor="remember"
-                  className="ml-2 text-sm text-gray-600"
+                  className="ml-2 text-sm text-[#6B7280]"
                 >
                   Remember me
                 </label>
@@ -174,7 +174,7 @@ export default function Login() {
 
               <Link
                 to="/forgot-password"
-                className="text-sm font-medium text-gray-900 hover:text-gray-700"
+                className="text-sm font-medium text-[#1F2937] hover:text-[#2563EB] transition-colors"
               >
                 Forgot password?
               </Link>
@@ -184,7 +184,7 @@ export default function Login() {
               type="submit"
               disabled={isLoading || !isFormValid}
               className={`w-full flex items-center justify-center px-6 py-3 rounded-lg font-medium text-white transition-colors ${
-                isLoading || !isFormValid ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'
+                isLoading || !isFormValid ? 'bg-[#E5DED6] cursor-not-allowed text-[#6B7280]' : 'bg-[#2563EB] hover:bg-[#1D4ED8] shadow-sm'
               }`}
             >
               {isLoading && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
@@ -193,11 +193,11 @@ export default function Login() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[#6B7280]">
               Don't have an account?{' '}
               <Link
                 to="/signup"
-                className="font-medium text-gray-900 hover:text-gray-700"
+                className="font-medium text-[#1F2937] hover:text-[#2563EB] transition-colors"
               >
                 Sign up
               </Link>
@@ -208,7 +208,7 @@ export default function Login() {
         <div className="mt-6 text-center">
           <Link
             to="/"
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="text-sm text-[#6B7280] hover:text-[#1F2937] transition-colors"
           >
             ← Back to home
           </Link>

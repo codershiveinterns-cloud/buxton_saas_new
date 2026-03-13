@@ -13,7 +13,7 @@ export default function PasswordInput({ label, error, className = '', ...props }
     <div className={className}>
       <label
         htmlFor={props.id}
-        className="block text-sm font-medium text-gray-900 mb-2"
+        className="block text-sm font-medium text-[#1F2937] mb-2"
       >
         {label}
       </label>
@@ -21,14 +21,14 @@ export default function PasswordInput({ label, error, className = '', ...props }
         <input
           {...props}
           type={showPassword ? 'text' : 'password'}
-          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition-colors pr-12 ${
-            error ? 'border-red-500' : 'border-gray-300'
+          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2563EB] transition-colors pr-12 ${
+            error ? 'border-red-500' : 'border-[#E5DED6]'
           }`}
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#1F2937] focus:outline-none transition-colors"
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}

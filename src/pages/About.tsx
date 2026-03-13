@@ -10,10 +10,10 @@ export default function About() {
 
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl font-bold text-gray-800 mb-6">
             About BUXTON SCAFFOLDING
           </h1>
-          <p className="text-xl text-gray-600 leading-relaxed">
+          <p className="text-xl text-gray-500 leading-relaxed">
             We're on a mission to revolutionize how construction teams manage
             scaffolding projects through innovative technology and seamless
             collaboration.
@@ -25,10 +25,10 @@ export default function About() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              <h2 className="text-3xl font-bold text-gray-800 mb-6">
                 Our Story
               </h2>
-              <div className="space-y-4 text-gray-600 leading-relaxed">
+              <div className="space-y-4 text-gray-500 leading-relaxed">
                 <p>
                   BUXTON SCAFFOLDING LTD – Company Number: 15873158<br/>
                   Incorporated on 2 August 2024.<br/><br/>
@@ -59,13 +59,13 @@ export default function About() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="p-8 bg-white rounded-xl border border-gray-200">
-              <div className="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center mb-6">
+              <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center mb-6">
                 <Target className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">
                 Our Mission
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-500 leading-relaxed">
                 To empower construction teams with the best scaffolding
                 management platform, making projects safer, more efficient, and
                 easier to manage. We believe that great software should be
@@ -74,13 +74,13 @@ export default function About() {
             </div>
 
             <div className="p-8 bg-white rounded-xl border border-gray-200">
-              <div className="w-12 h-12 bg-gray-900 rounded-lg flex items-center justify-center mb-6">
+              <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center mb-6">
                 <Eye className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">
                 Our Vision
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-500 leading-relaxed">
                 To become the global standard for scaffolding project
                 management, setting new benchmarks for safety, efficiency, and
                 team collaboration in the construction industry. We envision a
@@ -95,42 +95,42 @@ export default function About() {
 
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">
             Why Choose BUXTON?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             <div>
-              <div className="w-16 h-16 bg-gray-900 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 Built for Teams
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-500 text-sm">
                 Designed from the ground up with team collaboration at its core
               </p>
             </div>
 
             <div>
-              <div className="w-16 h-16 bg-gray-900 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 Industry Leading
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-500 text-sm">
                 Trusted by top construction companies worldwide
               </p>
             </div>
 
             <div>
-              <div className="w-16 h-16 bg-gray-900 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Target className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 Focused on Safety
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-500 text-sm">
                 Comprehensive safety compliance features built in
               </p>
             </div>
@@ -138,7 +138,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-indigo-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-6">
             Join Our Community
@@ -149,7 +149,7 @@ export default function About() {
           </p>
           <a
             href="/signup"
-            className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-gray-900 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+            className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-gray-800 bg-white rounded-lg hover:bg-gray-100 transition-colors"
           >
             Get Started Today
           </a>

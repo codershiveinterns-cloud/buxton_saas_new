@@ -88,8 +88,8 @@ export default function AboutProduct() {
       {/* Product Overview & Problem Statement */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 border-t border-gray-100">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">About the Platform</h2>
-          <div className="prose prose-lg prose-gray mx-auto text-gray-600 space-y-6">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">About the Platform</h2>
+          <div className="prose prose-lg prose-gray mx-auto text-gray-500 space-y-6">
             <p>
               BUXTON SCAFFOLDING LTD provides a <strong>cloud-based SaaS productivity and collaboration platform</strong> inspired by the simplicity and power of modern digital workspaces.
             </p>
@@ -97,11 +97,11 @@ export default function AboutProduct() {
               Our platform serves as a central hub where teams can organize documents, manage complex projects, track individual tasks, and collaborate effortlessly all in one place.
             </p>
             <div className="mt-12 p-8 bg-gray-50 rounded-2xl border border-gray-100 text-left">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <Target className="w-6 h-6 text-indigo-600" />
                 The Problem It Solves
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-500">
                 Many modern companies struggle with fragmented workflows, using scattered tools for taking notes, managing projects, and housing documentation. This platform combines everything into one simple, beautifully organized workspace, eliminating tool fatigue and keeping your team perfectly aligned.
               </p>
             </div>
@@ -113,8 +113,8 @@ export default function AboutProduct() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-xl text-gray-600">A simple, intuitive workflow to get your team moving faster.</p>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">How It Works</h2>
+            <p className="text-xl text-gray-500">A simple, intuitive workflow to get your team moving faster.</p>
           </div>
 
           <div className="relative">
@@ -123,11 +123,11 @@ export default function AboutProduct() {
               {steps.map((step) => (
                 <div key={step.id} className="relative flex items-start group">
                   <div className="h-16 w-16 rounded-2xl bg-white border-2 border-gray-200 flex items-center justify-center flex-shrink-0 z-10 md:ml-0 shadow-sm group-hover:border-indigo-600 transition-colors duration-200">
-                    <span className="text-xl font-bold text-gray-900">{step.id}</span>
+                    <span className="text-xl font-bold text-gray-800">{step.id}</span>
                   </div>
                   <div className="ml-6 pt-3">
-                    <h3 className="text-xl font-bold text-gray-900">{step.title}</h3>
-                    <p className="mt-2 text-gray-600 text-lg leading-relaxed">{step.description}</p>
+                    <h3 className="text-xl font-bold text-gray-800">{step.title}</h3>
+                    <p className="mt-2 text-gray-500 text-lg leading-relaxed">{step.description}</p>
                   </div>
                 </div>
               ))}
@@ -140,17 +140,17 @@ export default function AboutProduct() {
       <section className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Key Features</h2>
-            <p className="text-xl text-gray-600">Everything you need to manage work effectively.</p>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Key Features</h2>
+            <p className="text-xl text-gray-500">Everything you need to manage work effectively.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature) => (
               <div key={feature.name} className="p-8 rounded-2xl border border-gray-100 bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div className="w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center mb-6">
+                <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center mb-6">
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.name}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                <h3 className="text-xl font-bold text-gray-800 mb-3">{feature.name}</h3>
+                <p className="text-gray-500 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -158,7 +158,7 @@ export default function AboutProduct() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-900 text-white">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-indigo-600 text-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">Who Can Use This Space?</h2>
@@ -179,41 +179,41 @@ export default function AboutProduct() {
       {/* Why Choose Us */}
       <section className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12">Why Choose This Platform?</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-12">Why Choose This Platform?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-8 text-left">
             <div className="flex gap-4">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">✓</div>
               <div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">All tools in one place</h4>
-                <p className="text-gray-600 rounded">Eliminate the need to jump between multiple disjointed apps.</p>
+                <h4 className="text-lg font-bold text-gray-800 mb-2">All tools in one place</h4>
+                <p className="text-gray-500 rounded">Eliminate the need to jump between multiple disjointed apps.</p>
               </div>
             </div>
             <div className="flex gap-4">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">✓</div>
               <div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">Better productivity</h4>
-                <p className="text-gray-600">Streamlined workflows mean faster execution and less friction.</p>
+                <h4 className="text-lg font-bold text-gray-800 mb-2">Better productivity</h4>
+                <p className="text-gray-500">Streamlined workflows mean faster execution and less friction.</p>
               </div>
             </div>
             <div className="flex gap-4">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">✓</div>
               <div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">Organized workflows</h4>
-                <p className="text-gray-600">Customizable boards and docs adapt naturally to how you work.</p>
+                <h4 className="text-lg font-bold text-gray-800 mb-2">Organized workflows</h4>
+                <p className="text-gray-500">Customizable boards and docs adapt naturally to how you work.</p>
               </div>
             </div>
             <div className="flex gap-4">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">✓</div>
               <div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">Easy collaboration</h4>
-                <p className="text-gray-600">Built-in commenting, assigning, and real-time multiplayer editing.</p>
+                <h4 className="text-lg font-bold text-gray-800 mb-2">Easy collaboration</h4>
+                <p className="text-gray-500">Built-in commenting, assigning, and real-time multiplayer editing.</p>
               </div>
             </div>
             <div className="flex gap-4">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">✓</div>
               <div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">Accessible anywhere</h4>
-                <p className="text-gray-600">Fully cloud-native, ensuring your workspace is always within reach.</p>
+                <h4 className="text-lg font-bold text-gray-800 mb-2">Accessible anywhere</h4>
+                <p className="text-gray-500">Fully cloud-native, ensuring your workspace is always within reach.</p>
               </div>
             </div>
           </div>

@@ -17,10 +17,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Enable CORS
 app.use(cors({
-    origin: 'http://localhost:5173', // Vite default port
-    credentials: true,
+    origin: "https://buxton-saas-new.vercel.app",
+    credentials: true
 }));
-
 // Rate Limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

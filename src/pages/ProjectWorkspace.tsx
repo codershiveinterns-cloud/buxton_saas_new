@@ -67,13 +67,36 @@ export default function ProjectWorkspace() {
                 <h1 className="text-2xl font-bold text-[#1F2937]">{project.name}</h1>
                 <p className="text-[#6B7280]">{project.clientName} - {project.location}</p>
               </div>
-              <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                project.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                project.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                'bg-yellow-100 text-yellow-800'
-              }`}>
-                {project.status}
-              </span>
+              <select
+                value={project.status}
+                onChange={async (e) => {
+                  const newStatus = e.target.value;
+                  try {
+                    const token = localStorage.getItem('token');
+                    await axios.put(`http://localhost:5000/api/projects/${id}`, { status: newStatus }, {
+                      headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setProject({ ...project, status: newStatus });
+                    toast.success('Project status updated');
+                  } catch (error) {
+                    toast.error('Failed to update status');
+                  }
+                }}
+                className={`px-4 py-2 pr-8 rounded-full text-sm font-medium outline-none appearance-none cursor-pointer border-none bg-no-repeat ${
+                  project.status === 'Completed' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
+                  project.status === 'In Progress' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' :
+                  'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                }`}
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                  backgroundPosition: 'right 0.5rem center',
+                  backgroundSize: '1.5em 1.5em'
+                }}
+              >
+                <option value="Planning" className="bg-white text-gray-800">Planning</option>
+                <option value="In Progress" className="bg-white text-gray-800">In Progress</option>
+                <option value="Completed" className="bg-white text-gray-800">Completed</option>
+              </select>
             </div>
             
             {/* Tabs Navigation */}

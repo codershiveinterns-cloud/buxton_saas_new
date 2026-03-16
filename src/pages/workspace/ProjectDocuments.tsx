@@ -47,9 +47,10 @@ export default function ProjectDocuments({ projectId }: { projectId: string }) {
           'Content-Type': 'multipart/form-data'
         } 
       };
-      await api.post('/documents', formData, config);
+      const res = await api.post('/documents', formData, config);
       toast.success('Document uploaded');
-      fetchDocuments();
+      // Append the new document to the top of the list
+      setDocuments(prev => [res.data, ...prev]);
     } catch (error) {
       toast.error('Failed to upload document');
     } finally {

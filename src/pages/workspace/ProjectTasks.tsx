@@ -92,6 +92,12 @@ export default function ProjectTasks({ projectId }: { projectId: string }) {
     title: '', description: '', priority: 'Medium', assignedTo: '', dueDate: ''
   });
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<any | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    title: '', description: '', priority: 'Medium', assignedTo: '', dueDate: '', status: 'To Do'
+  });
+
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
   const isManager = user?.role !== 'member' && user?.role !== 'Worker';
@@ -105,7 +111,7 @@ export default function ProjectTasks({ projectId }: { projectId: string }) {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await api.get(`/tasks?projectId=${projectId}`, config);
+      const res = await api.get(`/tasks/project/${projectId}`, config);
       setTasks(res.data);
     } catch (error) {
       toast.error('Failed to load tasks');
@@ -246,7 +252,18 @@ export default function ProjectTasks({ projectId }: { projectId: string }) {
                        {/* Workaround for empty column droppable without writing a separate Droppable component: */}
                        <div style={{ minHeight: '100px' }} data-dnd-droppable-id={col.id}>
                          {colTasks.map(task => (
-                           <SortableTaskItem key={task._id} task={task} onClick={() => {}} />
+                           <SortableTaskItem key={task._id} task={task} onClick={() => {
+                             setSelectedTask(task);
+                             setEditFormData({
+                               title: task.title || '',
+                               description: task.description || '',
+                               priority: task.priority || 'Medium',
+                               assignedTo: task.assignedTo?._id || '',
+                               dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
+                               status: task.status || 'To Do'
+                             });
+                             setIsEditModalOpen(true);
+                           }} />
                          ))}
                        </div>
                     </div>
@@ -309,6 +326,76 @@ export default function ProjectTasks({ projectId }: { projectId: string }) {
               <div className="flex justify-end gap-3 pt-4 border-t border-[#E5DED6]">
                 <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 text-[#6B7280]">Cancel</button>
                 <button type="submit" className="px-4 py-2 bg-[#2563EB] text-white rounded-lg">Create</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {isEditModalOpen && selectedTask && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+            <h2 className="text-xl font-bold text-[#1F2937] mb-4">Edit Task</h2>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              try {
+                const token = localStorage.getItem('token');
+                const config = { headers: { Authorization: `Bearer ${token}` } };
+                await api.patch(`/tasks/${selectedTask._id}`, editFormData, config);
+                toast.success('Task updated');
+                setIsEditModalOpen(false);
+                setSelectedTask(null);
+                fetchTasks();
+              } catch (err) {
+                toast.error('Failed to update task');
+              }
+            }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Title</label>
+                <input required type="text" value={editFormData.title} onChange={e => setEditFormData({...editFormData, title: e.target.value})} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Description</label>
+                <textarea value={editFormData.description} onChange={e => setEditFormData({...editFormData, description: e.target.value})} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg outline-none" rows={3}></textarea>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                 <div>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Assign To</label>
+                  <select required value={editFormData.assignedTo} onChange={e => setEditFormData({...editFormData, assignedTo: e.target.value})} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg outline-none">
+                    <option value="" disabled>Select Member</option>
+                    {teamMembers.map(m => (
+                      <option key={m._id} value={m._id}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Due Date</label>
+                  <input required type="date" value={editFormData.dueDate} onChange={e => setEditFormData({...editFormData, dueDate: e.target.value})} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg outline-none" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Status</label>
+                  <select value={editFormData.status} onChange={e => setEditFormData({...editFormData, status: e.target.value})} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg outline-none">
+                    <option value="To Do">To Do</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="In Review">In Review</option>
+                    <option value="Completed">Completed</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Priority</label>
+                  <select value={editFormData.priority} onChange={e => setEditFormData({...editFormData, priority: e.target.value})} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg outline-none">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-[#E5DED6]">
+                <button type="button" onClick={() => { setIsEditModalOpen(false); setSelectedTask(null); }} className="px-4 py-2 text-[#6B7280]">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-[#2563EB] text-white rounded-lg">Save Changes</button>
               </div>
             </form>
           </div>

@@ -72,6 +72,24 @@ exports.getMyTasks = async (req, res) => {
     }
 };
 
+exports.getTasksByProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        let query = { projectId };
+        
+        // Optional RBAC filtering if needed per user spec
+        if (req.user.role === 'Worker' || req.user.role === 'member') {
+            query.assignedTo = req.user.id;
+        }
+
+        const tasks = await Task.find(query).populate('assignedTo', 'name email').sort({ createdAt: -1 });
+        res.json(tasks);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 exports.updateTask = async (req, res) => {
     try {
         if (req.user.role !== 'manager') {

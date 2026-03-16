@@ -8,7 +8,18 @@ const upload = require('../middleware/uploadMiddleware');
 // @route   POST api/documents
 // @desc    Upload document
 // @access  Private
-router.post('/', auth, upload.single('file'), documentController.createDocument);
+router.post('/', auth, (req, res, next) => {
+    upload.single('file')(req, res, (err) => {
+        if (err) {
+            return res.status(400).json({
+                success: false,
+                message: err.message || 'File upload failed'
+            });
+        }
+
+        next();
+    });
+}, documentController.createDocument);
 
 // @route   GET api/documents/project/:projectId
 // @desc    View documents by project

@@ -7,13 +7,13 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
   const [team, setTeam] = useState<any[]>([]);
   const [allMembers, setAllMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState('');
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [memberSearch, setMemberSearch] = useState('');
 
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
-  const isManager = user?.role === 'Manager' || user?.role === 'Admin';
+  const isManager = user?.role === 'Manager' || user?.role === 'manager' || user?.role === 'Admin';
 
   useEffect(() => {
     fetchProjectTeam();
@@ -37,7 +37,7 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await api.get('/team/members', config);
+      const res = await api.get('/users', config);
       setAllMembers(res.data);
     } catch (err) {
       console.error('Failed to load organization members');
@@ -46,15 +46,16 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedUserId) return;
+    if (selectedUserIds.length === 0) return;
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await api.post(`/projects/${projectId}/team`, { userId: selectedUserId }, config);
-      toast.success('Team member added to project');
+      const res = await api.post(`/projects/${projectId}/team`, { userIds: selectedUserIds }, config);
+      setTeam(res.data.teamMembers || []);
+      toast.success(selectedUserIds.length === 1 ? 'Team member added to project' : 'Team members added to project');
       setIsAddModalOpen(false);
-      setSelectedUserId('');
-      fetchProjectTeam();
+      setSelectedUserIds([]);
+      setMemberSearch('');
     } catch (err) {
       toast.error('Failed to add team member');
     }
@@ -65,9 +66,9 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await api.delete(`/projects/${projectId}/team/${userId}`, config);
+      const res = await api.delete(`/projects/${projectId}/team/${userId}`, config);
+      setTeam(res.data.teamMembers || []);
       toast.success('Team member removed');
-      fetchProjectTeam();
     } catch (err) {
       toast.error('Failed to remove team member');
     }
@@ -83,8 +84,17 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
     }
   };
 
+  const handleMemberSelection = (userId: string) => {
+    setSelectedUserIds((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
+  };
+
   // Filter out members that are already in the project team for the dropdown
   const availableMembers = allMembers.filter(m => !team.some(t => t._id === m._id));
+  const filteredMembers = availableMembers.filter((member) =>
+    member.name?.toLowerCase().includes(memberSearch.toLowerCase())
+  );
 
   return (
     <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm overflow-hidden h-full flex flex-col">
@@ -95,11 +105,14 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
         </div>
         {isManager && (
           <button 
-            onClick={() => setIsAddModalOpen(true)}
+            onClick={() => {
+              setIsAddModalOpen(true);
+              setMemberSearch('');
+            }}
             className="flex items-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Member</span>
+            <span>Add Team Member</span>
           </button>
         )}
       </div>
@@ -154,25 +167,41 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
             <h2 className="text-xl font-bold text-[#1F2937] mb-4">Add to Project</h2>
             <form onSubmit={handleAddMember} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#1F2937] mb-1">Select Member</label>
-                <select 
-                  required 
-                  value={selectedUserId} 
-                  onChange={e => setSelectedUserId(e.target.value)} 
-                  className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg outline-none focus:border-[#2563EB]"
-                >
-                  <option value="" disabled>Select a team member</option>
-                  {availableMembers.map(m => (
-                    <option key={m._id} value={m._id}>{m.name} ({m.role})</option>
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Search Team Members</label>
+                <input
+                  type="text"
+                  value={memberSearch}
+                  onChange={(e) => setMemberSearch(e.target.value)}
+                  placeholder="Search by name"
+                  className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg outline-none focus:border-[#2563EB] mb-3"
+                />
+                <label className="block text-sm font-medium text-[#1F2937] mb-2">Select Team Members</label>
+                <div className="max-h-64 overflow-y-auto border border-[#E5DED6] rounded-lg divide-y divide-[#E5DED6]">
+                  {filteredMembers.map((m) => (
+                    <label key={m._id} className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-[#F6F3EE]">
+                      <input
+                        type="checkbox"
+                        checked={selectedUserIds.includes(m._id)}
+                        onChange={() => handleMemberSelection(m._id)}
+                        className="mt-1 h-4 w-4 rounded border-[#D1D5DB] text-[#2563EB] focus:ring-[#2563EB]"
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-[#1F2937] truncate">{m.name}</p>
+                        <p className="text-xs text-[#6B7280] truncate">{m.email}</p>
+                      </div>
+                    </label>
                   ))}
-                </select>
+                </div>
                 {availableMembers.length === 0 && (
                   <p className="text-xs text-amber-600 mt-2">All available members are already in the project.</p>
                 )}
+                {availableMembers.length > 0 && filteredMembers.length === 0 && (
+                  <p className="text-xs text-[#6B7280] mt-2">No team members match that search.</p>
+                )}
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-[#E5DED6]">
-                <button type="button" onClick={() => { setIsAddModalOpen(false); setSelectedUserId(''); }} className="px-4 py-2 text-[#6B7280]">Cancel</button>
-                <button type="submit" disabled={!selectedUserId} className="px-4 py-2 bg-[#2563EB] text-white rounded-lg disabled:opacity-50">Add Member</button>
+                <button type="button" onClick={() => { setIsAddModalOpen(false); setSelectedUserIds([]); setMemberSearch(''); }} className="px-4 py-2 text-[#6B7280]">Cancel</button>
+                <button type="submit" disabled={selectedUserIds.length === 0} className="px-4 py-2 bg-[#2563EB] text-white rounded-lg disabled:opacity-50">Add Member</button>
               </div>
             </form>
           </div>

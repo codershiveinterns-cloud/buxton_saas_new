@@ -1,4 +1,8 @@
+const mongoose = require('mongoose');
 const Project = require('../models/Project');
+const User = require('../models/User');
+
+const populateProjectTeam = (query) => query.populate('teamMembers', 'name email role phone');
 
 exports.createProject = async (req, res) => {
     try {
@@ -99,7 +103,7 @@ exports.deleteProject = async (req, res) => {
 
 exports.getProjectTeam = async (req, res) => {
     try {
-        const project = await Project.findById(req.params.projectId).populate('teamMembers', 'name email role phone');
+        const project = await populateProjectTeam(Project.findById(req.params.projectId));
         if (!project) return res.status(404).json({ message: 'Project not found' });
         res.json(project.teamMembers || []);
     } catch (err) {
@@ -110,16 +114,42 @@ exports.getProjectTeam = async (req, res) => {
 
 exports.addTeamMember = async (req, res) => {
     try {
-        const { userId } = req.body;
+        const incomingUserIds = Array.isArray(req.body.userIds)
+            ? req.body.userIds
+            : req.body.userId
+                ? [req.body.userId]
+                : [];
+
+        const validUserIds = incomingUserIds.filter((id) => mongoose.Types.ObjectId.isValid(id));
+        if (validUserIds.length === 0) {
+            return res.status(400).json({ message: 'At least one valid userId is required' });
+        }
+
         const project = await Project.findById(req.params.projectId);
         if (!project) return res.status(404).json({ message: 'Project not found' });
 
-        if (!project.teamMembers.includes(userId)) {
-            project.teamMembers.push(userId);
-            await project.save();
+        const users = await User.find({ _id: { $in: validUserIds } }).select('_id');
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'No users found for the provided ids' });
         }
 
-        res.json({ success: true, message: 'Team member added' });
+        const existingIds = new Set((project.teamMembers || []).map((id) => id.toString()));
+        users.forEach((user) => {
+            const userId = user._id.toString();
+            if (!existingIds.has(userId)) {
+                project.teamMembers.push(user._id);
+                existingIds.add(userId);
+            }
+        });
+
+        await project.save();
+
+        const updatedProject = await populateProjectTeam(Project.findById(req.params.projectId));
+        res.json({
+            success: true,
+            message: 'Team member(s) added',
+            teamMembers: updatedProject?.teamMembers || []
+        });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Server error' });
@@ -135,7 +165,12 @@ exports.removeTeamMember = async (req, res) => {
         project.teamMembers = project.teamMembers.filter(id => id.toString() !== userId);
         await project.save();
 
-        res.json({ success: true, message: 'Team member removed' });
+        const updatedProject = await populateProjectTeam(Project.findById(req.params.projectId));
+        res.json({
+            success: true,
+            message: 'Team member removed',
+            teamMembers: updatedProject?.teamMembers || []
+        });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Server error' });

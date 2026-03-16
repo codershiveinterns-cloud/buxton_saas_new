@@ -9,8 +9,10 @@ export default function Documents() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
-  const [newFileUrl, setNewFileUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [newStatus, setNewStatus] = useState('Draft');
+  const [isUploading, setIsUploading] = useState(false);
+  const fileBaseUrl = (api.defaults.baseURL || '').replace(/\/api\/?$/, '');
 
   const fetchDocuments = async () => {
     try {
@@ -32,19 +34,49 @@ export default function Documents() {
 
   const handleCreateDocument = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedFile) {
+      toast.error('Please select a file to upload');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await api.post('/documents', { title: newTitle, fileUrl: newFileUrl, status: newStatus }, config);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('title', newTitle || selectedFile.name);
+      formData.append('status', newStatus);
+
+      setIsUploading(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      };
+      const response = await api.post('/documents', formData, config);
+
+      if (!response.data?.success) {
+        throw new Error('Upload was not confirmed by the server');
+      }
+
       toast.success('Document uploaded');
       setIsModalOpen(false);
       setNewTitle('');
-      setNewFileUrl('');
+      setSelectedFile(null);
       setNewStatus('Draft');
-      fetchDocuments();
+      await fetchDocuments();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to create document');
+    } finally {
+      setIsUploading(false);
     }
+  };
+
+  const getDocumentUrl = (fileUrl: string) =>
+    fileUrl?.startsWith('http') ? fileUrl : `${fileBaseUrl}${fileUrl}`;
+
+  const handleOpenDocument = (fileUrl: string) => {
+    window.open(getDocumentUrl(fileUrl), '_blank', 'noopener,noreferrer');
   };
 
   const handleDelete = async (id: string) => {
@@ -105,10 +137,14 @@ export default function Documents() {
                             <FileText className="w-5 h-5 text-[#6B7280]" />
                           </div>
                           <div>
-                            <p className="font-medium text-[#1F2937]">{doc.title}</p>
-                            <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="text-xs text-[#2563EB] hover:underline">
-                              {doc.fileUrl}
-                            </a>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenDocument(doc.fileUrl)}
+                              className="font-medium text-[#1F2937] hover:text-[#2563EB] hover:underline text-left"
+                            >
+                              {doc.title || doc.fileName}
+                            </button>
+                            <p className="text-xs text-[#2563EB] truncate">{doc.fileName}</p>
                           </div>
                         </div>
                       </td>
@@ -126,9 +162,8 @@ export default function Documents() {
                       </td>
                       <td className="px-6 py-4 flex justify-end gap-2">
                         <a
-                          href={doc.fileUrl}
-                          target="_blank"
-                          rel="noreferrer"
+                          href={getDocumentUrl(doc.fileUrl)}
+                          download={doc.fileName || doc.title}
                           className="p-2 text-[#6B7280] hover:text-[#1F2937] rounded-lg transition-colors"
                         >
                           <Download className="w-5 h-5" />
@@ -166,14 +201,13 @@ export default function Documents() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#1F2937] mb-1">URL (Drive link, AWS link, etc.)</label>
+                <label className="block text-sm font-medium text-[#1F2937] mb-1">Upload File</label>
                 <input
-                  type="url"
+                  type="file"
                   required
-                  value={newFileUrl}
-                  onChange={(e) => setNewFileUrl(e.target.value)}
+                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                   className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
-                  placeholder="https://..."
                 />
               </div>
               <div>
@@ -197,9 +231,10 @@ export default function Documents() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors"
+                  disabled={isUploading}
+                  className="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
                 >
-                  Upload
+                  {isUploading ? 'Uploading...' : 'Upload'}
                 </button>
               </div>
             </form>

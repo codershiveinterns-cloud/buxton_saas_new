@@ -1,42 +1,83 @@
+const mongoose = require('mongoose');
 const Document = require('../models/Document');
 
 exports.createDocument = async (req, res) => {
     try {
         const { title, projectId } = req.body;
+        if (projectId && !mongoose.Types.ObjectId.isValid(projectId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'A valid projectId is required'
+            });
+        }
+
+        if (!req.file && !req.body.fileUrl) {
+            return res.status(400).json({
+                success: false,
+                message: 'No file uploaded'
+            });
+        }
+
+        const workspaceManagerId =
+            req.user.role === 'Admin' || req.user.role === 'Manager' || req.user.role === 'manager'
+                ? req.user.id
+                : req.user.managerId;
+
         const finalFileUrl = req.file ? `/uploads/${req.file.filename}` : req.body.fileUrl;
         const fileName = req.file ? req.file.originalname : 'External File';
         const fileType = req.file ? req.file.mimetype : 'unknown';
 
-        const newDoc = new Document({ 
+        const newDoc = new Document({
             title: title || fileName,
             fileName,
             fileType,
-            fileUrl: finalFileUrl, 
-            projectId,
+            fileUrl: finalFileUrl,
+            projectId: projectId || undefined,
             uploadedBy: req.user.id,
-            managerId: req.user.role === 'Manager' ? req.user.id : null 
+            managerId: workspaceManagerId || undefined
         });
+
         const document = await newDoc.save();
+        const populatedDocument = await Document.findById(document._id).populate('uploadedBy', 'name email');
 
-        const Activity = require('../models/Activity');
-        await new Activity({
-            userId: req.user.id,
-            managerId: req.user.role === 'Manager' ? req.user.id : null,
-            action: 'Document uploaded',
-            projectId: projectId,
-            message: `Uploaded document: ${title || fileName}`
-        }).save();
+        if (workspaceManagerId) {
+            try {
+                const Activity = require('../models/Activity');
+                await new Activity({
+                    userId: req.user.id,
+                    managerId: workspaceManagerId,
+                    action: 'Document uploaded',
+                    projectId,
+                    message: `Uploaded document: ${title || fileName}`
+                }).save();
+            } catch (activityError) {
+                console.error('Document activity log error:', activityError.message);
+            }
+        }
 
-        res.status(201).json(document);
+        res.status(201).json({
+            success: true,
+            document: populatedDocument
+        });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ message: 'Server error' });
+        console.error('Document Upload Error:', err);
+        res.status(500).json({
+            success: false,
+            message: err.message || 'Document upload failed'
+        });
     }
 };
 
 exports.getDocumentsByProject = async (req, res) => {
     try {
         const { projectId } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(projectId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid projectId'
+            });
+        }
+
         const documents = await Document.find({ projectId }).populate('uploadedBy', 'name email').sort({ createdAt: -1 });
         res.json(documents);
     } catch (err) {

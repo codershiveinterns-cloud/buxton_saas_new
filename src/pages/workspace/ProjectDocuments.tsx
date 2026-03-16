@@ -11,27 +11,51 @@ export default function ProjectDocuments({ projectId }: { projectId: string }) {
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
   const isWorker = user?.role === 'Worker' || user?.role === 'member';
+  const fileBaseUrl = (api.defaults.baseURL || '').replace(/\/api\/?$/, '');
 
   useEffect(() => {
-    fetchDocuments();
+    if (!projectId) {
+      setDocuments([]);
+      setLoading(false);
+      return;
+    }
+
+    fetchDocuments(projectId);
   }, [projectId]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = async (
+    activeProjectId = projectId,
+    options?: { silent?: boolean; preserveLoadingState?: boolean }
+  ) => {
+    if (!activeProjectId) return;
+
+    if (!options?.preserveLoadingState) {
+      setLoading(true);
+    }
+
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await api.get(`/documents/project/${projectId}`, config);
+      const res = await api.get(`/documents/project/${activeProjectId}`, config);
       setDocuments(res.data);
     } catch (error) {
-      toast.error('Failed to load documents');
+      if (!options?.silent) {
+        toast.error('Failed to load documents');
+      }
     } finally {
-      setLoading(false);
+      if (!options?.preserveLoadingState) {
+        setLoading(false);
+      }
     }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
+    if (!projectId) {
+      toast.error('Project not found');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('file', file);
@@ -47,10 +71,22 @@ export default function ProjectDocuments({ projectId }: { projectId: string }) {
           'Content-Type': 'multipart/form-data'
         } 
       };
-      const res = await api.post('/documents', formData, config);
-      toast.success('Document uploaded');
-      // Append the new document to the top of the list
-      setDocuments(prev => [res.data, ...prev]);
+      const response = await api.post('/documents', formData, config);
+      if (!response.data?.success) {
+        throw new Error('Upload was not confirmed by the server');
+      }
+
+      const uploadedDocument = response.data.document;
+      if (uploadedDocument) {
+        setDocuments((prev) => {
+          const withoutDuplicate = prev.filter((doc) => doc._id !== uploadedDocument._id);
+          return [uploadedDocument, ...withoutDuplicate];
+        });
+      }
+
+      toast.success('Document uploaded successfully');
+
+      fetchDocuments(projectId, { silent: true, preserveLoadingState: true });
     } catch (error) {
       toast.error('Failed to upload document');
     } finally {
@@ -117,7 +153,7 @@ export default function ProjectDocuments({ projectId }: { projectId: string }) {
                       <FileText className="w-6 h-6 text-[#2563EB]" />
                     </div>
                     <a 
-                      href={`http://localhost:5000${doc.fileUrl}`} 
+                      href={doc.fileUrl?.startsWith('http') ? doc.fileUrl : `${fileBaseUrl}${doc.fileUrl}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-sm font-semibold text-[#1F2937] hover:text-[#2563EB] hover:underline truncate"

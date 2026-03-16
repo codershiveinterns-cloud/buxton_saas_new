@@ -3,8 +3,22 @@ const TeamMember = require('../models/TeamMember');
 
 exports.getUsers = async (req, res) => {
     try {
-        const workspaceId = req.user.role === 'manager' ? req.user.id : req.user.managerId;
-        const users = await TeamMember.find({ managerId: workspaceId, role: 'member' }).sort({ createdAt: -1 });
+        const isWorkspaceOwner = req.user.role === 'Admin' || req.user.role === 'Manager' || req.user.role === 'manager';
+        const workspaceId = isWorkspaceOwner ? req.user.id : req.user.managerId;
+
+        if (!workspaceId) {
+            return res.json([]);
+        }
+
+        const users = await User.find({
+            $or: [
+                { _id: workspaceId },
+                { managerId: workspaceId }
+            ]
+        })
+            .select('name email role phone createdAt')
+            .sort({ createdAt: -1 });
+
         res.json(users);
     } catch (err) {
         console.error(err.message);

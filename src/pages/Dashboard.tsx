@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
+import Notepad from '../components/Notepad';
 import {
   FileText,
   CheckSquare,
@@ -8,6 +10,7 @@ import {
   Clock,
   Plus,
   MoreVertical,
+  FolderOpen
 } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
@@ -21,10 +24,10 @@ export default function Dashboard() {
   ]);
 
   const [recentDocuments, setRecentDocuments] = useState<any[]>([]);
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [activeProjects, setActiveProjects] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
   
-  const [user, setUser] = useState<any>(() => {
+  const [user] = useState<any>(() => {
     const userData = localStorage.getItem('user');
     return userData ? JSON.parse(userData) : null;
   });
@@ -41,33 +44,34 @@ export default function Dashboard() {
           }
         };
 
-        // Fetch Stats
-        const statsRes = await api.get('/dashboard/stats', config);
-        const data = statsRes.data;
-        const fetchedStats = [
+        const dashboardRes = await api.get('/dashboard', config);
+        const data = dashboardRes.data;
+
+        setStats([
           { label: 'Active Projects', value: data.activeProjects.toString(), icon: FileText, trend: '' },
           { label: 'Tasks Completed', value: data.tasksCompleted.toString(), icon: CheckSquare, trend: '' },
           { label: 'Team Members', value: data.teamMembers.toString(), icon: TrendingUp, trend: '' },
           { label: 'Hours Logged', value: data.hoursLogged.toLocaleString(), icon: Clock, trend: '' }
-        ];
-        setStats(fetchedStats);
+        ]);
 
-        // Fetch Documents
-        const docsRes = await api.get('/documents', config);
-        setRecentDocuments(docsRes.data);
+        setRecentDocuments(data.recentDocuments || []);
+        
+        // Active projects for the list component (limit to 5)
+        // Wait, the API returns activeProjects as a number. 
+        // We need the /api/dashboard to return the *list* of active projects as well, or we fetch it separately. 
+        // The user spec said: "activeProjects -> count projects where status is Planning or In Progress". 
+        // For the "Active Projects" list UI, we still need the list. Let's fetch /projects normally for the list.
+        const projectsRes = await api.get('/projects', config);
+        if (projectsRes.data && projectsRes.data.projects) {
+          const activeProjList = projectsRes.data.projects.filter((p: any) => p.status !== 'Completed');
+          setActiveProjects(activeProjList.slice(0, 5));
+        }
 
-        // Fetch Tasks
-        const taskEndpoint = user?.role !== 'member' ? '/tasks' : '/tasks/my-tasks';
-        const tasksRes = await api.get(taskEndpoint, config);
-        const activeTasks = tasksRes.data.filter((t: any) => t.status !== 'completed');
-        setTasks(activeTasks);
-
-        // Fetch Activities
-        const activitiesRes = await api.get('/activities', config);
-        const recentActivities = activitiesRes.data.map((a: any) => ({
+        const recentActivities = (data.activities || []).map((a: any) => ({
           user: a.userId?.name || 'Unknown',
-          action: a.message.replace(` – by ${a.userId?.name.split(' ')[0]}`, ''), // Strip standard suffix if needed, or just display message directly
+          action: a.action,
           message: a.message,
+          project: a.projectId ? a.projectId.name : null,
           time: new Date(a.createdAt).toLocaleString(undefined, {
             month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
           })
@@ -136,57 +140,35 @@ export default function Dashboard() {
       setTaskTitle('');
       setTaskDescription('');
       
-      // Fast refresh
-      const taskEndpoint = user?.role !== 'member' ? '/tasks' : '/tasks/my-tasks';
-      const tasksRes = await api.get(taskEndpoint, config);
-      const activeTasks = tasksRes.data.filter((t: any) => t.status !== 'completed');
-      setTasks(activeTasks);
-      
-      const statsRes = await api.get('/dashboard/stats', config);
-      const data = statsRes.data;
+      // Fast refresh projects
+      if (user?.role !== 'member') {
+        const projectsRes = await api.get('/projects', config);
+        const activeProjList = projectsRes.data.projects.filter((p: any) => p.status !== 'Completed');
+        setActiveProjects(activeProjList.slice(0, 5));
+      }
+
+      const dashboardRes = await api.get('/dashboard', config);
+      const data = dashboardRes.data;
       setStats([
         { label: 'Active Projects', value: data.activeProjects.toString(), icon: FileText, trend: '' },
         { label: 'Tasks Completed', value: data.tasksCompleted.toString(), icon: CheckSquare, trend: '' },
         { label: 'Team Members', value: data.teamMembers.toString(), icon: TrendingUp, trend: '' },
         { label: 'Hours Logged', value: data.hoursLogged.toLocaleString(), icon: Clock, trend: '' }
       ]);
+      setActivities((data.activities || []).map((a: any) => ({
+        user: a.userId?.name || 'Unknown',
+        action: a.action,
+        message: a.message,
+        project: a.projectId ? a.projectId.name : null,
+        time: new Date(a.createdAt).toLocaleString(undefined, {
+          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        })
+      })));
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to create task');
     }
   };
 
-  const handleTaskCompletion = async (taskId: string) => {
-    try {
-      const config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-      await api.patch(`/tasks/update-status/${taskId}`, { status: 'completed' }, config);
-      toast.success('Task marked as completed');
-      
-      // Fast refresh dashboard data
-      const taskEndpoint = user?.role !== 'member' ? '/tasks' : '/tasks/my-tasks';
-      const tasksRes = await api.get(taskEndpoint, config);
-      setTasks(tasksRes.data.filter((t: any) => t.status !== 'completed'));
-      
-      const activitiesRes = await api.get('/activities', config);
-      setActivities(activitiesRes.data.map((a: any) => ({
-        user: a.userId?.name || 'Unknown',
-        message: a.message,
-        time: new Date(a.createdAt).toLocaleString(undefined, {
-          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        })
-      })));
-      
-      const statsRes = await api.get('/dashboard/stats', config);
-      const data = statsRes.data;
-      setStats([
-        { label: 'Active Projects', value: data.activeProjects.toString(), icon: FileText, trend: '' },
-        { label: 'Tasks Completed', value: data.tasksCompleted.toString(), icon: CheckSquare, trend: '' },
-        { label: 'Team Members', value: data.teamMembers.toString(), icon: TrendingUp, trend: '' },
-        { label: 'Hours Logged', value: data.hoursLogged.toLocaleString(), icon: Clock, trend: '' }
-      ]);
-    } catch (err: any) {
-      toast.error('Failed to update task');
-    }
-  };
 
   const handleUploadDocument = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,9 +196,8 @@ export default function Dashboard() {
       setDocStatus('Draft');
 
       // Fast refresh
-      const configJson = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-      const docsRes = await api.get('/documents', configJson);
-      setRecentDocuments(docsRes.data);
+      const dashboardRes = await api.get('/dashboard', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      setRecentDocuments(dashboardRes.data.recentDocuments || []);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to upload document');
     }
@@ -226,24 +207,29 @@ export default function Dashboard() {
     <div className="flex h-screen bg-[#F6F3EE]">
       <Sidebar />
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header />
+        
+        <div className="flex-1 overflow-auto">
         {loading ? (
           <div className="flex items-center justify-center h-full text-gray-500 font-medium">
             Loading dashboard...
           </div>
         ) : (
-          <div className="p-8">
-            <div className="mb-8">
-            <h1 className="text-3xl font-bold text-[#1F2937] mb-2">
-              Welcome back, {user?.name ? user.name.split(' ')[0] : 'User'}
-            </h1>
-            <p className="text-[#6B7280]">
-              Here's what's happening with your projects today.
-            </p>
-          </div>
+          <div className="flex flex-col p-8 space-y-8">
+            {/* Welcome Section */}
+            <div>
+              <h1 className="text-3xl font-bold text-[#1F2937] mb-2">
+                Welcome back, {user?.name ? user.name.split(' ')[0] : 'User'}
+              </h1>
+              <p className="text-[#6B7280]">
+                Here's what's happening with your projects today.
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat, index) => {
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats.map((stat: any, index: number) => {
               const Icon = stat.icon;
               return (
                 <div
@@ -286,10 +272,11 @@ export default function Dashboard() {
                 {recentDocuments.length === 0 ? (
                   <p className="text-sm text-[#6B7280]">No documents found.</p>
                 ) : (
-                  recentDocuments.map((doc, index) => (
+                  recentDocuments.map((doc: any, index: number) => (
                     <div
                       key={index}
                       className="flex items-start justify-between p-3 hover:bg-[#EFE9E1] rounded-lg transition-colors cursor-pointer"
+                      onClick={() => window.open(`${api.defaults.baseURL?.replace('/api', '')}${doc.fileUrl}`, '_blank')}
                     >
                       <div className="flex items-start space-x-3">
                         <div className="w-10 h-10 bg-[#EFE9E1] rounded-lg flex items-center justify-center flex-shrink-0">
@@ -319,56 +306,51 @@ export default function Dashboard() {
 
             <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
               <div className="flex items-center justify-between mb-6">
-                <Link to="/tasks" className="hover:opacity-70 transition-opacity">
+                <Link to="/projects" className="hover:opacity-70 transition-opacity">
                   <h2 className="text-lg font-semibold text-[#1F2937] cursor-pointer">
-                    Active Tasks
+                    Active Projects
                   </h2>
                 </Link>
-                <button 
-                  onClick={() => setIsTaskModalOpen(true)}
+                <Link 
+                  to="/projects"
                   className="p-2 hover:bg-[#EFE9E1] rounded-lg transition-colors"
                 >
-                  <Plus className="w-5 h-5 text-[#6B7280]" />
-                </button>
+                  <FolderOpen className="w-5 h-5 text-[#6B7280]" />
+                </Link>
               </div>
               <div className="space-y-3">
-                {tasks.length === 0 ? (
-                  <p className="text-sm text-[#6B7280]">No tasks found.</p>
+                {activeProjects.length === 0 ? (
+                  <p className="text-sm text-[#6B7280]">No active projects found.</p>
                 ) : (
-                  tasks.map((task, index) => (
+                  activeProjects.map((project: any, index: number) => (
                     <div
                       key={index}
                       className="flex items-center justify-between p-3 hover:bg-[#EFE9E1] rounded-lg transition-colors cursor-pointer"
                     >
                       <div className="flex items-center space-x-3">
-                        <input
-                          type="checkbox"
-                          checked={false}
-                          onChange={() => handleTaskCompletion(task._id)}
-                          className="w-4 h-4 rounded border-[#E5DED6] cursor-pointer text-[#1F2937] focus:ring-[#2563EB]"
-                        />
-                        <span className="text-sm text-[#1F2937]">{task.title}</span>
+                        <FolderOpen className="w-4 h-4 text-[#2563EB]" />
+                        <span className="text-sm text-[#1F2937]">{project.name}</span>
                       </div>
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
-                          task.priority === 'High'
-                            ? 'bg-red-50 text-red-700 ring-1 ring-red-600/20'
-                            : task.priority === 'Medium'
+                          project.status === 'Planning'
                             ? 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-600/20'
-                            : 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
+                            : 'bg-blue-50 text-blue-700 ring-1 ring-blue-600/20'
                         }`}
                       >
-                        {task.priority}
+                        {project.status}
                       </span>
                     </div>
                   ))
                 )}
               </div>
             </div>
-          </div>
+            </div>
 
-          <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
-            <div className="flex items-center justify-between mb-6">
+            {/* Bottom Row: Activity and Notepad */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6 h-[400px] flex flex-col">
+              <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-[#1F2937]">
                 Recent Team Activity
               </h2>
@@ -376,30 +358,38 @@ export default function Dashboard() {
                 <MoreVertical className="w-5 h-5 text-[#6B7280]" />
               </button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-72 overflow-y-auto pr-2">
               {activities.length === 0 ? (
                 <p className="text-sm text-[#6B7280]">No recent activity.</p>
               ) : (
-                activities.map((activity, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="w-10 h-10 bg-[#EFE9E1] rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-[#6B7280] font-semibold text-sm">
+                activities.map((activity: any, index: number) => (
+                  <div key={index} className="flex items-start space-x-3 p-3 hover:bg-[#EFE9E1] rounded-lg transition-colors">
+                    <div className="w-10 h-10 bg-[#white] rounded-full flex items-center justify-center flex-shrink-0 border border-[#E5DED6]">
+                      <span className="text-[#2563EB] font-bold text-sm">
                         {activity.user && typeof activity.user === 'string' ? activity.user.charAt(0).toUpperCase() : '?'}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-[#1F2937]">
-                        {activity.message}
+                        <span className="font-semibold">{activity.user}</span> {activity.message.replace(` – by ${activity.user.split(' ')[0]}`, '')}
+                        {activity.project && <span className="text-[#2563EB]"> ({activity.project})</span>}
                       </p>
-                      <p className="text-xs text-[#6B7280]">{activity.time}</p>
+                      <p className="text-xs text-[#6B7280] mt-1">{activity.time}</p>
                     </div>
                   </div>
                 ))
               )}
+              </div>
+            </div>
+            
+            {/* Notepad Widget */}
+            <div className="h-[400px]">
+              {user?.role !== 'member' && user?.role !== 'Worker' && <Notepad />}
             </div>
           </div>
         </div>
         )}
+        </div>
       </div>
 
       {isTaskModalOpen && (
@@ -427,7 +417,7 @@ export default function Dashboard() {
                 <div>
                   <label className="block text-sm font-medium text-[#1F2937] mb-1">Assign To</label>
                   <select value={taskAssignedTo} onChange={(e) => setTaskAssignedTo(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none" required>
-                    {teamMembers.map(m => (
+                    {teamMembers.map((m: any) => (
                       <option key={m._id} value={m._id}>{m.name}</option>
                     ))}
                   </select>

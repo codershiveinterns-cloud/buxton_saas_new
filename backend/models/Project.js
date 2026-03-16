@@ -5,12 +5,33 @@ const ProjectSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    clientName: {
+        type: String,
+        required: true,
+    },
+    location: {
+        type: String,
+        required: true,
+    },
+    startDate: {
+        type: Date,
+        required: true,
+    },
+    endDate: {
+        type: Date,
+        required: true,
+    },
     status: {
         type: String,
-        enum: ['Active', 'Completed'],
-        default: 'Active'
+        enum: ['Planning', 'In Progress', 'Completed'],
+        default: 'Planning'
     },
-    managerId: {
+    supervisorId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: false
+    },
+    managerId: { // Keeping managerId for tracking who created it/owns it
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true

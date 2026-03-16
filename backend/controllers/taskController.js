@@ -4,12 +4,34 @@ const User = require('../models/User');
 
 exports.createTask = async (req, res) => {
     try {
-        if (req.user.role !== 'manager') {
+        if (!['Admin', 'Manager', 'manager'].includes(req.user.role)) {
             return res.status(403).json({ message: 'Only managers can create tasks' });
         }
-        const { title, description, priority, status, assignedTo, dueDate } = req.body;
-        const newTask = new Task({ title, description, priority, status, assignedTo, dueDate, managerId: req.user.id });
+        const { title, description, priority, status, assignedTo, dueDate, projectId } = req.body;
+        const newTask = new Task({ title, description, priority, status, assignedTo, dueDate, projectId, managerId: req.user.id });
         const task = await newTask.save();
+
+        await Activity.create({
+            userId: req.user.id,
+            managerId: req.user.id,
+            action: 'Task created',
+            projectId: projectId || null,
+            message: `Created task: ${title}`
+        });
+
+        if (assignedTo) {
+            const Notification = require('../models/Notification');
+            const notif = await Notification.create({
+                userId: assignedTo,
+                title: 'New Task Assigned',
+                message: `You have been assigned to: ${title}`,
+                type: 'task_assigned',
+                link: `/projects/${projectId}/tasks`
+            });
+            const io = req.app.locals.io;
+            if (io) io.to(assignedTo.toString()).emit('new_notification', notif);
+        }
+
         res.status(201).json(task);
     } catch (err) {
         console.error(err.message);
@@ -19,15 +41,20 @@ exports.createTask = async (req, res) => {
 
 exports.getTasks = async (req, res) => {
     try {
-        const workspaceId = req.user.role === 'manager' ? req.user.id : req.user.managerId;
-        let query = { managerId: workspaceId };
+        let query = {};
         
-        // Members only see their assigned tasks
-        if (req.user.role === 'member') {
+        // Admins can see all tasks, Managers see theirs, Workers see assigned.
+        if (req.user.role === 'Manager' || req.user.role === 'manager') {
+            query.managerId = req.user.id;
+        } else if (req.user.role === 'Worker' || req.user.role === 'member') {
             query.assignedTo = req.user.id;
         }
 
-        const tasks = await Task.find(query).sort({ createdAt: -1 });
+        if (req.query.projectId) {
+            query.projectId = req.query.projectId;
+        }
+
+        const tasks = await Task.find(query).populate('assignedTo', 'name email').sort({ createdAt: -1 });
         res.json(tasks);
     } catch (err) {
         console.error(err.message);
@@ -72,17 +99,26 @@ exports.updateTaskStatus = async (req, res) => {
         task.status = req.body.status;
         await task.save();
 
-        if (previousStatus !== 'completed' && req.body.status === 'completed') {
+        if (previousStatus !== 'Completed' && req.body.status === 'Completed') {
             const user = await User.findById(req.user.id);
             const userName = user ? user.name.split(' ')[0] : 'Unknown';
             
             const activity = new Activity({
                 userId: req.user.id,
-                managerId: req.user.role === 'manager' ? req.user.id : req.user.managerId,
+                managerId: req.user.role === 'Manager' || req.user.role === 'manager' ? req.user.id : req.user.managerId,
                 message: `Task Completed: ${task.title} – by ${userName}`,
-                type: 'task_completed'
+                action: 'Task status updated',
+                projectId: task.projectId || null
             });
             await activity.save();
+        } else if (previousStatus !== req.body.status) {
+            await Activity.create({
+                userId: req.user.id,
+                managerId: req.user.role === 'Manager' || req.user.role === 'manager' ? req.user.id : req.user.managerId,
+                message: `Task Status Updated to ${req.body.status}: ${task.title}`,
+                action: 'Task status updated',
+                projectId: task.projectId || null
+            });
         }
 
         res.json(task);

@@ -2,21 +2,43 @@ const Document = require('../models/Document');
 
 exports.createDocument = async (req, res) => {
     try {
-        if (req.user.role !== 'manager') {
-            return res.status(403).json({ message: 'Only managers can upload documents' });
-        }
-        const { title, status, fileUrl: bodyFileUrl } = req.body;
-        // The file could be coming from multer (req.file) or directly from body if it's external or a text link
-        const finalFileUrl = req.file ? `/uploads/${req.file.filename}` : bodyFileUrl;
+        const { title, projectId } = req.body;
+        const finalFileUrl = req.file ? `/uploads/${req.file.filename}` : req.body.fileUrl;
+        const fileName = req.file ? req.file.originalname : 'External File';
+        const fileType = req.file ? req.file.mimetype : 'unknown';
 
         const newDoc = new Document({ 
-            title, 
+            title: title || fileName,
+            fileName,
+            fileType,
             fileUrl: finalFileUrl, 
-            status: status || 'Draft', 
-            managerId: req.user.id 
+            projectId,
+            uploadedBy: req.user.id,
+            managerId: req.user.role === 'Manager' ? req.user.id : null 
         });
         const document = await newDoc.save();
+
+        const Activity = require('../models/Activity');
+        await new Activity({
+            userId: req.user.id,
+            managerId: req.user.role === 'Manager' ? req.user.id : null,
+            action: 'Document uploaded',
+            projectId: projectId,
+            message: `Uploaded document: ${title || fileName}`
+        }).save();
+
         res.status(201).json(document);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.getDocumentsByProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const documents = await Document.find({ projectId }).populate('uploadedBy', 'name email').sort({ createdAt: -1 });
+        res.json(documents);
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Server error' });
@@ -25,7 +47,7 @@ exports.createDocument = async (req, res) => {
 
 exports.getDocuments = async (req, res) => {
     try {
-        const workspaceId = req.user.role === 'manager' ? req.user.id : req.user.managerId;
+        const workspaceId = req.user.role === 'manager' || req.user.role === 'Manager' ? req.user.id : req.user.managerId;
         const documents = await Document.find({ managerId: workspaceId }).sort({ createdAt: -1 });
         res.json(documents);
     } catch (err) {
@@ -36,8 +58,8 @@ exports.getDocuments = async (req, res) => {
 
 exports.deleteDocument = async (req, res) => {
     try {
-        if (req.user.role !== 'manager') {
-            return res.status(403).json({ message: 'Only managers can delete documents' });
+        if (req.user.role === 'Worker') {
+            return res.status(403).json({ message: 'Workers cannot delete documents' });
         }
         const document = await Document.findById(req.params.id);
         if (!document) {

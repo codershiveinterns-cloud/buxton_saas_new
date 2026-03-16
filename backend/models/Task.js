@@ -17,8 +17,13 @@ const TaskSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'in-progress', 'completed'],
-        default: 'pending'
+        enum: ['To Do', 'In Progress', 'In Review', 'Completed', 'pending', 'in-progress', 'completed'],
+        default: 'To Do'
+    },
+    projectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+        required: false // existing tasks might not have it
     },
     assignedTo: {
         type: mongoose.Schema.Types.ObjectId,

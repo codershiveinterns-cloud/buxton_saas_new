@@ -1,0 +1,108 @@
+import { useState, useEffect } from 'react';
+import { Bell, Check } from 'lucide-react';
+import api from '../lib/api';
+import { io } from 'socket.io-client';
+
+export default function Header() {
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    fetchNotifications();
+
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+       const user = JSON.parse(userStr);
+       const baseURL = api.defaults.baseURL || 'http://localhost:5000';
+       const socketHost = baseURL.replace('/api', '');
+       const socket = io(socketHost);
+       socket.emit('register', user.id);
+
+       socket.on('new_notification', (notification) => {
+           setNotifications(prev => [notification, ...prev]);
+           setUnreadCount(prev => prev + 1);
+       });
+
+       return () => {
+           socket.disconnect();
+       };
+    }
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+      const res = await api.get('/notifications', config);
+      setNotifications(res.data);
+      setUnreadCount(res.data.filter((n: any) => !n.read).length);
+    } catch (err) {
+      console.error('Failed to fetch notifications');
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+      await api.patch('/notifications/read-all', {}, config);
+      setNotifications(notifications.map(n => ({...n, read: true})));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const formatTime = (time: string) => {
+    const d = new Date(time);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString();
+  };
+
+  return (
+    <div className="bg-white h-16 border-b border-[#E5DED6] flex items-center justify-end px-6 sticky top-0 z-40">
+      
+      <div className="relative">
+        <button 
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className="relative p-2 rounded-full hover:bg-[#EFE9E1] transition-colors"
+        >
+          <Bell className="w-6 h-6 text-[#6B7280]" />
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+          )}
+        </button>
+
+        {isDropdownOpen && (
+          <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-[#E5DED6] overflow-hidden z-50">
+            <div className="p-4 border-b border-[#E5DED6] flex justify-between items-center bg-[#F6F3EE]">
+              <h3 className="font-semibold text-[#1F2937]">Notifications</h3>
+              {unreadCount > 0 && (
+                <button onClick={markAllRead} className="text-xs text-[#2563EB] hover:underline flex items-center">
+                  <Check className="w-3 h-3 mr-1" /> Mark all read
+                </button>
+              )}
+            </div>
+            
+            <div className="max-h-96 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <div className="p-6 text-center text-[#6B7280] text-sm">No new notifications</div>
+              ) : (
+                notifications.map(notif => (
+                  <div key={notif._id} className={`p-4 border-b border-[#E5DED6] hover:bg-[#F6F3EE] transition-colors cursor-pointer ${notif.read ? 'opacity-70' : 'bg-blue-50/30'}`}>
+                    <div className="flex justify-between items-start mb-1">
+                      <h4 className="font-semibold text-sm text-[#1F2937]">{notif.title}</h4>
+                    </div>
+                    <p className="text-sm text-[#6B7280]">{notif.message}</p>
+                    <span className="text-xs text-gray-400 mt-2 block">{formatTime(notif.createdAt)}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+    </div>
+  );
+}

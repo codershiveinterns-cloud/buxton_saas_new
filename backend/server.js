@@ -5,6 +5,28 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/database');
 
 const app = express();
+const http = require('http');
+const { Server } = require('socket.io');
+
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: [
+            "http://localhost:5173",
+            "https://buxton-saas-new.vercel.app"
+        ],
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+        credentials: true
+    }
+});
+
+app.locals.io = io;
+
+io.on('connection', (socket) => {
+    socket.on('register', (userId) => {
+        socket.join(userId);
+    });
+});
 
 // Connect Database
 connectDB();
@@ -41,16 +63,19 @@ app.get('/api/health', (req, res) => {
 });
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/dashboard', require('./routes/statsRoutes'));
+app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/documents', require('./routes/documentRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/tasks', require('./routes/taskMessageRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/team', require('./routes/teamRoutes'));
 app.use('/api/activities', require('./routes/activityRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/notes', require('./routes/noteRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log('---');
     console.log('Server running successfully');
     console.log(`Backend API: http://localhost:${PORT}`);

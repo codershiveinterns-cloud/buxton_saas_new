@@ -10,6 +10,11 @@ const upload = require('../middleware/uploadMiddleware');
 // @access  Private
 router.post('/', auth, upload.single('file'), documentController.createDocument);
 
+// @route   GET api/documents/project/:projectId
+// @desc    View documents by project
+// @access  Private
+router.get('/project/:projectId', auth, documentController.getDocumentsByProject);
+
 // @route   GET api/documents
 // @desc    View documents
 // @access  Private

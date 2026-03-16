@@ -10,6 +10,7 @@ import Documents from './pages/Documents';
 import Tasks from './pages/Tasks';
 import Team from './pages/Team';
 import Settings from './pages/Settings';
+import PrivateNotes from './pages/PrivateNotes';
 import Terms from './pages/Terms';
 import Refund from './pages/Refund';
 import Cookies from './pages/Cookies';
@@ -17,6 +18,8 @@ import Security from './pages/Security';
 import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ProtectedRoute from './components/ProtectedRoute';
+import Projects from './pages/Projects';
+import ProjectWorkspace from './pages/ProjectWorkspace';
 import { Toaster } from 'react-hot-toast';
 
 function App() {
@@ -34,9 +37,12 @@ function App() {
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:id/*" element={<ProjectWorkspace />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/team" element={<Team />} />
+          <Route path="/notes" element={<PrivateNotes />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
 

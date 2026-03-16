@@ -13,11 +13,16 @@ const ActivitySchema = new mongoose.Schema({
     },
     message: {
         type: String,
-        required: true
+        required: false
     },
-    type: {
+    action: {
         type: String,
         required: true
+    },
+    projectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+        required: false
     },
     createdAt: {
         type: Date,

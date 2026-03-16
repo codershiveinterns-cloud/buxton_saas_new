@@ -57,6 +57,14 @@ exports.createUser = async (req, res) => {
         // Could add an emailer code here like `sendEmail(email, "You have been invited!")`
         console.log(`\n\n[System] Invitation silently processed for ${email}\n\n`);
 
+        const Activity = require('../models/Activity');
+        await new Activity({
+            userId: req.user.id,
+            managerId: req.user.id,
+            action: 'Team member added',
+            message: `Invited team member: ${name} (${role || 'member'})`
+        }).save();
+
         res.status(201).json({ 
             success: true, 
             message: 'Team member invited successfully', 

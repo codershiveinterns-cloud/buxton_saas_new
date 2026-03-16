@@ -7,6 +7,7 @@ import {
   Settings,
   LogOut,
   Hammer,
+  Folder,
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -18,9 +19,11 @@ export default function Sidebar() {
 
   const managerItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Folder, label: 'Projects', path: '/projects' },
     { icon: FileText, label: 'Documents', path: '/documents' },
     { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
     { icon: Users, label: 'Team', path: '/team' },
+    { icon: FileText, label: 'Private Notes', path: '/notes' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 

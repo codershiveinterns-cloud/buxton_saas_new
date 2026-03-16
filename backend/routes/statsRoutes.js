@@ -8,4 +8,9 @@ const auth = require('../middleware/authMiddleware');
 // @access  Private
 router.get('/stats', auth, statsController.getStats);
 
+// @route   GET api/dashboard
+// @desc    Get comprehensive dashboard data
+// @access  Private
+router.get('/', auth, statsController.getDashboard);
+
 module.exports = router;

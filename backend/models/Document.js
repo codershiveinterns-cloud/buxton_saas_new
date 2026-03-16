@@ -6,19 +6,30 @@ const DocumentSchema = new mongoose.Schema({
         required: [true, 'Please provide a document title'],
         trim: true
     },
+    fileName: {
+        type: String, // from multer originalname
+    },
+    fileType: {
+        type: String, // doc, pdf, image
+    },
     fileUrl: {
         type: String,
         required: [true, 'Please provide a file URL']
     },
-    status: {
-        type: String,
-        enum: ['Draft', 'Published'],
-        default: 'Draft'
+    projectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+        required: true
     },
-    managerId: {
+    uploadedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
+    },
+    managerId: { // Legacy or to know workspace owner
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: false
     },
     createdAt: {
         type: Date,

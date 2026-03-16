@@ -1,6 +1,12 @@
 const Task = require('../models/Task');
 const Activity = require('../models/Activity');
 const User = require('../models/User');
+const mongoose = require('mongoose');
+
+const populateTaskRelations = (query) =>
+    query
+        .populate('assignedTo', 'name email')
+        .populate('projectId', 'name');
 
 exports.createTask = async (req, res) => {
     try {
@@ -8,14 +14,19 @@ exports.createTask = async (req, res) => {
             return res.status(403).json({ message: 'Only managers can create tasks' });
         }
         const { title, description, priority, status, assignedTo, dueDate, projectId } = req.body;
+        if (!projectId || !mongoose.Types.ObjectId.isValid(projectId)) {
+            return res.status(400).json({ message: 'A valid projectId is required' });
+        }
+
         const newTask = new Task({ title, description, priority, status, assignedTo, dueDate, projectId, managerId: req.user.id });
         const task = await newTask.save();
+        const populatedTask = await populateTaskRelations(Task.findById(task._id));
 
         await Activity.create({
             userId: req.user.id,
             managerId: req.user.id,
             action: 'Task created',
-            projectId: projectId || null,
+            projectId,
             message: `Created task: ${title}`
         });
 
@@ -32,7 +43,7 @@ exports.createTask = async (req, res) => {
             if (io) io.to(assignedTo.toString()).emit('new_notification', notif);
         }
 
-        res.status(201).json(task);
+        res.status(201).json(populatedTask);
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Server error' });
@@ -54,7 +65,7 @@ exports.getTasks = async (req, res) => {
             query.projectId = req.query.projectId;
         }
 
-        const tasks = await Task.find(query).populate('assignedTo', 'name email').sort({ createdAt: -1 });
+        const tasks = await populateTaskRelations(Task.find(query).sort({ createdAt: -1 }));
         res.json(tasks);
     } catch (err) {
         console.error(err.message);
@@ -64,7 +75,7 @@ exports.getTasks = async (req, res) => {
 
 exports.getMyTasks = async (req, res) => {
     try {
-        const tasks = await Task.find({ assignedTo: req.user.id }).sort({ createdAt: -1 });
+        const tasks = await populateTaskRelations(Task.find({ assignedTo: req.user.id }).sort({ createdAt: -1 }));
         res.json(tasks);
     } catch (err) {
         console.error(err.message);
@@ -82,7 +93,7 @@ exports.getTasksByProject = async (req, res) => {
             query.assignedTo = req.user.id;
         }
 
-        const tasks = await Task.find(query).populate('assignedTo', 'name email').sort({ createdAt: -1 });
+        const tasks = await populateTaskRelations(Task.find(query).sort({ createdAt: -1 }));
         res.json(tasks);
     } catch (err) {
         console.error(err.message);
@@ -92,10 +103,14 @@ exports.getTasksByProject = async (req, res) => {
 
 exports.updateTask = async (req, res) => {
     try {
-        if (req.user.role !== 'manager') {
+        if (!['Manager', 'manager', 'Admin'].includes(req.user.role)) {
             return res.status(403).json({ message: 'Only managers can fully edit tasks' });
         }
-        const task = await Task.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
+        if (req.body.projectId && !mongoose.Types.ObjectId.isValid(req.body.projectId)) {
+            return res.status(400).json({ message: 'A valid projectId is required' });
+        }
+
+        const task = await populateTaskRelations(Task.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true }));
         if (!task) return res.status(404).json({ message: 'Task not found' });
         res.json(task);
     } catch (err) {
@@ -139,7 +154,8 @@ exports.updateTaskStatus = async (req, res) => {
             });
         }
 
-        res.json(task);
+        const populatedTask = await populateTaskRelations(Task.findById(task._id));
+        res.json(populatedTask);
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ message: 'Server error' });
@@ -148,7 +164,7 @@ exports.updateTaskStatus = async (req, res) => {
 
 exports.deleteTask = async (req, res) => {
     try {
-        if (req.user.role !== 'manager') {
+        if (!['Manager', 'manager', 'Admin'].includes(req.user.role)) {
             return res.status(403).json({ message: 'Only managers can delete tasks' });
         }
         const task = await Task.findById(req.params.id);

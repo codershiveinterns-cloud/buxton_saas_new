@@ -99,7 +99,9 @@ export default function Dashboard() {
   const [taskPriority, setTaskPriority] = useState('Medium');
   const [taskAssignedTo, setTaskAssignedTo] = useState('');
   const [taskDueDate, setTaskDueDate] = useState('');
+  const [taskProjectId, setTaskProjectId] = useState('');
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
 
   // Document Modal State
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
@@ -113,7 +115,7 @@ export default function Dashboard() {
       const fetchMembers = async () => {
         try {
           const config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
-          const res = await api.get('/team/members', config);
+          const res = await api.get('/users', config);
           setTeamMembers(res.data);
           if (res.data.length > 0) setTaskAssignedTo(res.data[0]._id);
         } catch (err) {
@@ -124,6 +126,22 @@ export default function Dashboard() {
     }
   }, [isTaskModalOpen, teamMembers.length]);
 
+  useEffect(() => {
+    if (isTaskModalOpen && projects.length === 0) {
+      const fetchProjects = async () => {
+        try {
+          const config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+          const res = await api.get('/projects', config);
+          setProjects(res.data.projects || []);
+          if (res.data.projects?.length > 0) setTaskProjectId(res.data.projects[0]._id);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchProjects();
+    }
+  }, [isTaskModalOpen, projects.length]);
+
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -132,6 +150,7 @@ export default function Dashboard() {
         title: taskTitle,
         description: taskDescription,
         priority: taskPriority,
+        projectId: taskProjectId,
         assignedTo: taskAssignedTo,
         dueDate: taskDueDate
       }, config);
@@ -139,6 +158,7 @@ export default function Dashboard() {
       setIsTaskModalOpen(false);
       setTaskTitle('');
       setTaskDescription('');
+      setTaskProjectId('');
       
       // Fast refresh projects
       if (user?.role !== 'member') {
@@ -406,6 +426,15 @@ export default function Dashboard() {
                 <textarea value={taskDescription} onChange={(e) => setTaskDescription(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none" rows={3} />
               </div>
               <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#1F2937] mb-1">Project</label>
+                  <select value={taskProjectId} onChange={(e) => setTaskProjectId(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none" required>
+                    <option value="" disabled>Select Project</option>
+                    {projects.map((project: any) => (
+                      <option key={project._id} value={project._id}>{project.name}</option>
+                    ))}
+                  </select>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-[#1F2937] mb-1">Priority</label>
                   <select value={taskPriority} onChange={(e) => setTaskPriority(e.target.value)} className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none">

@@ -23,7 +23,7 @@ const TaskSchema = new mongoose.Schema({
     projectId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project',
-        required: false // existing tasks might not have it
+        required: [true, 'Please select a project']
     },
     assignedTo: {
         type: mongoose.Schema.Types.ObjectId,

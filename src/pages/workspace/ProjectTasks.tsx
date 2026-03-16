@@ -124,7 +124,7 @@ export default function ProjectTasks({ projectId }: { projectId: string }) {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await api.get('/team/members', config);
+      const res = await api.get('/users', config);
       setTeamMembers(res.data);
     } catch (err) {
       console.error(err);

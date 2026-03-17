@@ -22,6 +22,7 @@ import Projects from './pages/Projects';
 import ProjectWorkspace from './pages/ProjectWorkspace';
 import { Toaster } from 'react-hot-toast';
 import ScrollToTop from './components/ScrollToTop';
+import Meetings from './pages/Meetings';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:id/*" element={<ProjectWorkspace />} />
+          <Route path="/meetings" element={<Meetings />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/team" element={<Team />} />

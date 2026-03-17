@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
+  CalendarDays,
   LayoutDashboard,
   FileText,
   CheckSquare,
@@ -30,6 +31,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const managerItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: Folder, label: 'Projects', path: '/projects' },
+    { icon: CalendarDays, label: 'Meetings', path: '/meetings' },
     { icon: FileText, label: 'Documents', path: '/documents' },
     { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
     { icon: Users, label: 'Team', path: '/team' },
@@ -39,6 +41,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const memberItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: CalendarDays, label: 'Meetings', path: '/meetings' },
     { icon: CheckSquare, label: 'My Tasks', path: '/tasks' },
     { icon: Settings, label: 'Profile', path: '/settings' },
   ];

@@ -2,6 +2,8 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const TeamMember = require('../models/TeamMember');
+const { createWorkspaceForUser, ensureWorkspaceForUser } = require('../utils/workspace');
 
 
 // Helper for strong password validation
@@ -23,14 +25,12 @@ exports.signup = async (req, res) => {
         let user = await User.findOne({ email });
         if (user) {
             if (user.status === 'invited') {
-                // Feature 4: Automatically join them to the workspace and flip to active
                 user.status = 'active';
                 user.firebaseUid = firebaseUid;
                 user.name = name;
                 await user.save();
+                await ensureWorkspaceForUser(user);
                 
-                // Update their specific TeamMember relationship status
-                const TeamMember = require('../models/TeamMember');
                 await TeamMember.updateMany(
                     { email: user.email, status: 'invited' },
                     { $set: { status: 'active', name: user.name } }
@@ -46,10 +46,12 @@ exports.signup = async (req, res) => {
             name,
             email,
             firebaseUid,
+            role: 'manager',
             status: 'active'
         });
 
         await user.save();
+        await createWorkspaceForUser(user);
 
         res.status(201).json({ message: 'User registered successfully via Firebase' });
 
@@ -79,9 +81,9 @@ exports.acceptInvite = async (req, res) => {
         user.firebaseUid = firebaseUid;
         if (name) user.name = name; // Update name to what they signed up with
         await user.save();
+        await ensureWorkspaceForUser(user);
 
         // Also activate their specific TeamMember relationship
-        const TeamMember = require('../models/TeamMember');
         await TeamMember.updateMany(
             { email: user.email, status: 'invited' },
             { $set: { status: 'active', name: user.name } }
@@ -125,7 +127,7 @@ exports.login = async (req, res) => {
 
     try {
         // Find MongoDB user
-        const user = await User.findOne({ email });
+        let user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials or user does not exist in the database' });
         }
@@ -135,6 +137,8 @@ exports.login = async (req, res) => {
         if (user.firebaseUid && user.firebaseUid !== firebaseUid) {
              return res.status(401).json({ message: 'Unauthorized UID mismatch' });
         }
+
+        user = await ensureWorkspaceForUser(user);
 
         // Once Firebase authentication via the frontend passes, generate backend app JWT
         const payload = {
@@ -157,6 +161,7 @@ exports.login = async (req, res) => {
                         email: user.email,
                         role: user.role,
                         managerId: user.managerId,
+                        workspaceId: user.workspaceId,
                         firebaseUid: user.firebaseUid
                     }
                 });

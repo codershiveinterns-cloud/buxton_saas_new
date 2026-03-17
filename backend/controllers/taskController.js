@@ -1,6 +1,7 @@
 const Task = require('../models/Task');
 const Activity = require('../models/Activity');
 const User = require('../models/User');
+const Project = require('../models/Project');
 const mongoose = require('mongoose');
 
 const populateTaskRelations = (query) =>
@@ -13,18 +14,42 @@ exports.createTask = async (req, res) => {
         if (!['Admin', 'Manager', 'manager'].includes(req.user.role)) {
             return res.status(403).json({ message: 'Only managers can create tasks' });
         }
+
         const { title, description, priority, status, assignedTo, dueDate, projectId } = req.body;
         if (!projectId || !mongoose.Types.ObjectId.isValid(projectId)) {
             return res.status(400).json({ message: 'A valid projectId is required' });
         }
 
-        const newTask = new Task({ title, description, priority, status, assignedTo, dueDate, projectId, managerId: req.user.id });
+        const project = await Project.findOne({ _id: projectId, workspaceId: req.user.workspaceId }).select('_id');
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found in this workspace' });
+        }
+
+        if (assignedTo) {
+            const assignee = await User.findOne({ _id: assignedTo, workspaceId: req.user.workspaceId }).select('_id');
+            if (!assignee) {
+                return res.status(404).json({ message: 'Assigned user not found in this workspace' });
+            }
+        }
+
+        const newTask = new Task({
+            title,
+            description,
+            priority,
+            status,
+            assignedTo,
+            dueDate,
+            projectId,
+            managerId: req.user.id,
+            workspaceId: req.user.workspaceId
+        });
         const task = await newTask.save();
         const populatedTask = await populateTaskRelations(Task.findById(task._id));
 
         await Activity.create({
             userId: req.user.id,
             managerId: req.user.id,
+            workspaceId: req.user.workspaceId,
             action: 'Task created',
             projectId,
             message: `Created task: ${title}`
@@ -52,12 +77,9 @@ exports.createTask = async (req, res) => {
 
 exports.getTasks = async (req, res) => {
     try {
-        let query = {};
-        
-        // Admins can see all tasks, Managers see theirs, Workers see assigned.
-        if (req.user.role === 'Manager' || req.user.role === 'manager') {
-            query.managerId = req.user.id;
-        } else if (req.user.role === 'Worker' || req.user.role === 'member') {
+        const query = { workspaceId: req.user.workspaceId };
+
+        if (req.user.role === 'Worker' || req.user.role === 'member') {
             query.assignedTo = req.user.id;
         }
 
@@ -75,7 +97,9 @@ exports.getTasks = async (req, res) => {
 
 exports.getMyTasks = async (req, res) => {
     try {
-        const tasks = await populateTaskRelations(Task.find({ assignedTo: req.user.id }).sort({ createdAt: -1 }));
+        const tasks = await populateTaskRelations(
+            Task.find({ assignedTo: req.user.id, workspaceId: req.user.workspaceId }).sort({ createdAt: -1 })
+        );
         res.json(tasks);
     } catch (err) {
         console.error(err.message);
@@ -86,9 +110,8 @@ exports.getMyTasks = async (req, res) => {
 exports.getTasksByProject = async (req, res) => {
     try {
         const { projectId } = req.params;
-        let query = { projectId };
-        
-        // Optional RBAC filtering if needed per user spec
+        const query = { projectId, workspaceId: req.user.workspaceId };
+
         if (req.user.role === 'Worker' || req.user.role === 'member') {
             query.assignedTo = req.user.id;
         }
@@ -110,7 +133,27 @@ exports.updateTask = async (req, res) => {
             return res.status(400).json({ message: 'A valid projectId is required' });
         }
 
-        const task = await populateTaskRelations(Task.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true }));
+        if (req.body.projectId) {
+            const project = await Project.findOne({ _id: req.body.projectId, workspaceId: req.user.workspaceId }).select('_id');
+            if (!project) {
+                return res.status(404).json({ message: 'Project not found in this workspace' });
+            }
+        }
+
+        if (req.body.assignedTo) {
+            const assignee = await User.findOne({ _id: req.body.assignedTo, workspaceId: req.user.workspaceId }).select('_id');
+            if (!assignee) {
+                return res.status(404).json({ message: 'Assigned user not found in this workspace' });
+            }
+        }
+
+        const task = await populateTaskRelations(
+            Task.findOneAndUpdate(
+                { _id: req.params.id, workspaceId: req.user.workspaceId },
+                { $set: req.body },
+                { new: true }
+            )
+        );
         if (!task) return res.status(404).json({ message: 'Task not found' });
         res.json(task);
     } catch (err) {
@@ -121,13 +164,13 @@ exports.updateTask = async (req, res) => {
 
 exports.updateTaskStatus = async (req, res) => {
     try {
-        const task = await Task.findById(req.params.id);
+        const task = await Task.findOne({ _id: req.params.id, workspaceId: req.user.workspaceId });
         if (!task) return res.status(404).json({ message: 'Task not found' });
-        
+
         if (req.user.role === 'member' && task.assignedTo.toString() !== req.user.id) {
             return res.status(403).json({ message: 'You can only update tasks assigned to you' });
         }
-        
+
         const previousStatus = task.status;
         task.status = req.body.status;
         await task.save();
@@ -135,11 +178,12 @@ exports.updateTaskStatus = async (req, res) => {
         if (previousStatus !== 'Completed' && req.body.status === 'Completed') {
             const user = await User.findById(req.user.id);
             const userName = user ? user.name.split(' ')[0] : 'Unknown';
-            
+
             const activity = new Activity({
                 userId: req.user.id,
                 managerId: req.user.role === 'Manager' || req.user.role === 'manager' ? req.user.id : req.user.managerId,
-                message: `Task Completed: ${task.title} – by ${userName}`,
+                workspaceId: req.user.workspaceId,
+                message: `Task Completed: ${task.title} â€“ by ${userName}`,
                 action: 'Task status updated',
                 projectId: task.projectId || null
             });
@@ -148,6 +192,7 @@ exports.updateTaskStatus = async (req, res) => {
             await Activity.create({
                 userId: req.user.id,
                 managerId: req.user.role === 'Manager' || req.user.role === 'manager' ? req.user.id : req.user.managerId,
+                workspaceId: req.user.workspaceId,
                 message: `Task Status Updated to ${req.body.status}: ${task.title}`,
                 action: 'Task status updated',
                 projectId: task.projectId || null
@@ -167,7 +212,7 @@ exports.deleteTask = async (req, res) => {
         if (!['Manager', 'manager', 'Admin'].includes(req.user.role)) {
             return res.status(403).json({ message: 'Only managers can delete tasks' });
         }
-        const task = await Task.findById(req.params.id);
+        const task = await Task.findOne({ _id: req.params.id, workspaceId: req.user.workspaceId });
         if (!task) {
             return res.status(404).json({ message: 'Task not found' });
         }

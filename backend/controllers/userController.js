@@ -3,19 +3,11 @@ const TeamMember = require('../models/TeamMember');
 
 exports.getUsers = async (req, res) => {
     try {
-        const isWorkspaceOwner = req.user.role === 'Admin' || req.user.role === 'Manager' || req.user.role === 'manager';
-        const workspaceId = isWorkspaceOwner ? req.user.id : req.user.managerId;
-
-        if (!workspaceId) {
+        if (!req.user.workspaceId) {
             return res.json([]);
         }
 
-        const users = await User.find({
-            $or: [
-                { _id: workspaceId },
-                { managerId: workspaceId }
-            ]
-        })
+        const users = await User.find({ workspaceId: req.user.workspaceId })
             .select('name email role phone createdAt')
             .sort({ createdAt: -1 });
 
@@ -45,6 +37,7 @@ exports.createUser = async (req, res) => {
                 role: 'member', 
                 phone,
                 managerId: req.user.id, // Primary context
+                workspaceId: req.user.workspaceId,
                 status: 'invited'
             });
             await user.save();
@@ -63,6 +56,7 @@ exports.createUser = async (req, res) => {
                 role: role || 'member', 
                 phone,
                 managerId: req.user.id,
+                workspaceId: req.user.workspaceId,
                 status: 'invited'
             });
             await teamMember.save();
@@ -75,6 +69,7 @@ exports.createUser = async (req, res) => {
         await new Activity({
             userId: req.user.id,
             managerId: req.user.id,
+            workspaceId: req.user.workspaceId,
             action: 'Team member added',
             message: `Invited team member: ${name} (${role || 'member'})`
         }).save();
@@ -94,6 +89,9 @@ exports.deleteUser = async (req, res) => {
     try {
         const teamMember = await TeamMember.findById(req.params.id);
         if (!teamMember) return res.status(404).json({ message: 'Member not found in team' });
+        if (teamMember.workspaceId?.toString() !== req.user.workspaceId?.toString()) {
+            return res.status(403).json({ message: 'Not authorized to remove this member' });
+        }
         await teamMember.deleteOne();
         res.json({ message: 'Member removed from team' });
     } catch (err) {

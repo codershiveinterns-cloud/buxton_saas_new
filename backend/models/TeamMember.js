@@ -18,6 +18,11 @@ const TeamMemberSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    workspaceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Workspace',
+        required: false
+    },
     teamId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team' // Assuming there is or will be a Team logic, otherwise just generic

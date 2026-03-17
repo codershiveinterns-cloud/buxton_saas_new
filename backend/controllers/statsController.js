@@ -6,16 +6,16 @@ const Activity = require('../models/Activity');
 
 exports.getStats = async (req, res) => {
     try {
-        const workspaceId = req.user.role === 'manager' ? req.user.id : req.user.managerId;
+        const workspaceId = req.user.workspaceId;
 
         // Active Projects
-        const activeProjects = await Project.countDocuments({ managerId: workspaceId, status: { $in: ['Planning', 'In Progress'] } });
+        const activeProjects = await Project.countDocuments({ workspaceId, status: { $in: ['Planning', 'In Progress'] } });
 
         // Tasks Completed
-        const tasksCompleted = await Task.countDocuments({ managerId: workspaceId, status: 'completed' });
+        const tasksCompleted = await Task.countDocuments({ workspaceId, status: 'completed' });
 
         // Team Members
-        const teamMembers = await User.countDocuments({ managerId: workspaceId, role: 'member' });
+        const teamMembers = await User.countDocuments({ workspaceId, role: 'member' });
 
         // Hours Logged (Placeholder logic, 5 hours per completed task)
         const hoursLogged = tasksCompleted * 5;
@@ -34,20 +34,20 @@ exports.getStats = async (req, res) => {
 
 exports.getDashboard = async (req, res) => {
     try {
-        const workspaceId = req.user.role === 'manager' || req.user.role === 'Manager' ? req.user.id : (req.user.managerId || req.user.id);
+        const workspaceId = req.user.workspaceId;
 
-        const activeProjects = await Project.countDocuments({ managerId: workspaceId, status: { $in: ['Planning', 'In Progress'] } });
-        const tasksCompleted = await Task.countDocuments({ managerId: workspaceId, status: 'completed' });
-        const teamMembers = await User.countDocuments({ managerId: workspaceId });
+        const activeProjects = await Project.countDocuments({ workspaceId, status: { $in: ['Planning', 'In Progress'] } });
+        const tasksCompleted = await Task.countDocuments({ workspaceId, status: 'completed' });
+        const teamMembers = await User.countDocuments({ workspaceId });
         const hoursLogged = tasksCompleted * 5;
 
-        const activities = await Activity.find({ managerId: workspaceId })
+        const activities = await Activity.find({ workspaceId })
             .sort({ createdAt: -1 })
             .limit(10)
             .populate('userId', 'name email')
             .populate('projectId', 'name');
 
-        const recentDocuments = await Document.find({ managerId: workspaceId })
+        const recentDocuments = await Document.find({ workspaceId })
             .sort({ createdAt: -1 })
             .limit(5);
 

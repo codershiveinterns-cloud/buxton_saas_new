@@ -11,6 +11,11 @@ const ActivitySchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    workspaceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Workspace',
+        required: false
+    },
     message: {
         type: String,
         required: false

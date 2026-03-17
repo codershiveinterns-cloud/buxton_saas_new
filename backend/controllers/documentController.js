@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Document = require('../models/Document');
+const Project = require('../models/Project');
 
 exports.createDocument = async (req, res) => {
     try {
@@ -9,6 +10,16 @@ exports.createDocument = async (req, res) => {
                 success: false,
                 message: 'A valid projectId is required'
             });
+        }
+
+        if (projectId) {
+            const project = await Project.findOne({ _id: projectId, workspaceId: req.user.workspaceId }).select('_id');
+            if (!project) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Project not found in this workspace'
+                });
+            }
         }
 
         if (!req.file && !req.body.fileUrl) {
@@ -34,7 +45,8 @@ exports.createDocument = async (req, res) => {
             fileUrl: finalFileUrl,
             projectId: projectId || undefined,
             uploadedBy: req.user.id,
-            managerId: workspaceManagerId || undefined
+            managerId: workspaceManagerId || undefined,
+            workspaceId: req.user.workspaceId
         });
 
         const document = await newDoc.save();
@@ -46,6 +58,7 @@ exports.createDocument = async (req, res) => {
                 await new Activity({
                     userId: req.user.id,
                     managerId: workspaceManagerId,
+                    workspaceId: req.user.workspaceId,
                     action: 'Document uploaded',
                     projectId,
                     message: `Uploaded document: ${title || fileName}`
@@ -78,7 +91,10 @@ exports.getDocumentsByProject = async (req, res) => {
             });
         }
 
-        const documents = await Document.find({ projectId }).populate('uploadedBy', 'name email').sort({ createdAt: -1 });
+        const documents = await Document.find({
+            projectId,
+            workspaceId: req.user.workspaceId
+        }).populate('uploadedBy', 'name email').sort({ createdAt: -1 });
         res.json(documents);
     } catch (err) {
         console.error(err.message);
@@ -88,8 +104,7 @@ exports.getDocumentsByProject = async (req, res) => {
 
 exports.getDocuments = async (req, res) => {
     try {
-        const workspaceId = req.user.role === 'manager' || req.user.role === 'Manager' ? req.user.id : req.user.managerId;
-        const documents = await Document.find({ managerId: workspaceId }).sort({ createdAt: -1 });
+        const documents = await Document.find({ workspaceId: req.user.workspaceId }).sort({ createdAt: -1 });
         res.json(documents);
     } catch (err) {
         console.error(err.message);
@@ -102,7 +117,7 @@ exports.deleteDocument = async (req, res) => {
         if (req.user.role === 'Worker') {
             return res.status(403).json({ message: 'Workers cannot delete documents' });
         }
-        const document = await Document.findById(req.params.id);
+        const document = await Document.findOne({ _id: req.params.id, workspaceId: req.user.workspaceId });
         if (!document) {
             return res.status(404).json({ message: 'Document not found' });
         }

@@ -26,11 +26,16 @@ const UserSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: ['Admin', 'Manager', 'Supervisor', 'Worker', 'manager', 'member'],
-        default: 'Worker'
+        default: 'manager'
     },
     managerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
+    },
+    workspaceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Workspace',
+        required: false
     },
     phone: {
         type: String,

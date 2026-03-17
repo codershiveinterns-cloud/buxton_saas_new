@@ -1,7 +1,17 @@
 const TaskMessage = require('../models/TaskMessage');
+const Task = require('../models/Task');
 
 exports.getMessages = async (req, res) => {
     try {
+        const task = await Task.findOne({ _id: req.params.taskId, workspaceId: req.user.workspaceId }).select('_id assignedTo');
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        if ((req.user.role === 'Worker' || req.user.role === 'member') && task.assignedTo.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Not authorized to view these messages' });
+        }
+
         const messages = await TaskMessage.find({ taskId: req.params.taskId })
             .populate('senderId', 'name role')
             .sort({ createdAt: 1 });
@@ -17,6 +27,15 @@ exports.addMessage = async (req, res) => {
         const { taskId, message } = req.body;
         if (!taskId || !message) {
             return res.status(400).json({ message: 'Task ID and message are required' });
+        }
+
+        const task = await Task.findOne({ _id: taskId, workspaceId: req.user.workspaceId }).select('_id assignedTo');
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        if ((req.user.role === 'Worker' || req.user.role === 'member') && task.assignedTo.toString() !== req.user.id) {
+            return res.status(403).json({ message: 'Not authorized to add messages to this task' });
         }
 
         const newMessage = new TaskMessage({

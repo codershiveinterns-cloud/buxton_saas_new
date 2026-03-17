@@ -2,9 +2,9 @@ const Activity = require('../models/Activity');
 
 exports.getRecentActivities = async (req, res) => {
     try {
-        const workspaceId = req.user.role === 'manager' ? req.user.id : req.user.managerId;
+        const workspaceId = req.user.workspaceId;
         
-        const activities = await Activity.find({ managerId: workspaceId })
+        const activities = await Activity.find({ workspaceId })
             .sort({ createdAt: -1 })
             .limit(10)
             .populate('userId', 'name email')

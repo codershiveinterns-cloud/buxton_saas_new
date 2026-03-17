@@ -31,6 +31,11 @@ const DocumentSchema = new mongoose.Schema({
         ref: 'User',
         required: false
     },
+    workspaceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Workspace',
+        required: false
+    },
     createdAt: {
         type: Date,
         default: Date.now

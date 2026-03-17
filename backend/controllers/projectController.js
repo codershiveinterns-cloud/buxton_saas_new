@@ -16,7 +16,8 @@ exports.createProject = async (req, res) => {
             endDate,
             status,
             supervisorId,
-            managerId: req.user.id
+            managerId: req.user.id,
+            workspaceId: req.user.workspaceId
         });
 
         await newProject.save();
@@ -25,6 +26,7 @@ exports.createProject = async (req, res) => {
         await new Activity({
             userId: req.user.id,
             managerId: req.user.id,
+            workspaceId: req.user.workspaceId,
             action: 'Project created',
             projectId: newProject._id,
             message: `Created new project: ${name}`
@@ -39,16 +41,9 @@ exports.createProject = async (req, res) => {
 
 exports.getProjects = async (req, res) => {
     try {
-        let query = {};
-        if (req.user.role === 'Admin') {
-            // Admin sees all
-        } else if (req.user.role === 'Manager') {
-            query.managerId = req.user.id;
-        } else if (req.user.role === 'Supervisor') {
+        let query = { workspaceId: req.user.workspaceId };
+        if (req.user.role === 'Supervisor') {
             query.supervisorId = req.user.id;
-        } else {
-            // Worker? Needs to be part of the task but let's assume they can see projects they work on.
-            // For now, if Worker, maybe return assigned projects or no access here.
         }
 
         const projects = await Project.find(query).populate('supervisorId', 'name email').sort({ createdAt: -1 });
@@ -61,7 +56,7 @@ exports.getProjects = async (req, res) => {
 
 exports.getProjectById = async (req, res) => {
     try {
-        const project = await Project.findById(req.params.id)
+        const project = await Project.findOne({ _id: req.params.id, workspaceId: req.user.workspaceId })
             .populate('supervisorId', 'name email')
             .populate('managerId', 'name email');
         
@@ -77,7 +72,11 @@ exports.getProjectById = async (req, res) => {
 
 exports.updateProject = async (req, res) => {
     try {
-        const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const project = await Project.findOneAndUpdate(
+            { _id: req.params.id, workspaceId: req.user.workspaceId },
+            req.body,
+            { new: true, runValidators: true }
+        );
         if (!project) {
             return res.status(404).json({ success: false, message: 'Project not found' });
         }
@@ -90,7 +89,7 @@ exports.updateProject = async (req, res) => {
 
 exports.deleteProject = async (req, res) => {
     try {
-        const project = await Project.findByIdAndDelete(req.params.id);
+        const project = await Project.findOneAndDelete({ _id: req.params.id, workspaceId: req.user.workspaceId });
         if (!project) {
             return res.status(404).json({ success: false, message: 'Project not found' });
         }
@@ -103,7 +102,7 @@ exports.deleteProject = async (req, res) => {
 
 exports.getProjectTeam = async (req, res) => {
     try {
-        const project = await populateProjectTeam(Project.findById(req.params.projectId));
+        const project = await populateProjectTeam(Project.findOne({ _id: req.params.projectId, workspaceId: req.user.workspaceId }));
         if (!project) return res.status(404).json({ message: 'Project not found' });
         res.json(project.teamMembers || []);
     } catch (err) {
@@ -125,10 +124,10 @@ exports.addTeamMember = async (req, res) => {
             return res.status(400).json({ message: 'At least one valid userId is required' });
         }
 
-        const project = await Project.findById(req.params.projectId);
+        const project = await Project.findOne({ _id: req.params.projectId, workspaceId: req.user.workspaceId });
         if (!project) return res.status(404).json({ message: 'Project not found' });
 
-        const users = await User.find({ _id: { $in: validUserIds } }).select('_id');
+        const users = await User.find({ _id: { $in: validUserIds }, workspaceId: req.user.workspaceId }).select('_id');
         if (users.length === 0) {
             return res.status(404).json({ message: 'No users found for the provided ids' });
         }
@@ -144,7 +143,7 @@ exports.addTeamMember = async (req, res) => {
 
         await project.save();
 
-        const updatedProject = await populateProjectTeam(Project.findById(req.params.projectId));
+        const updatedProject = await populateProjectTeam(Project.findOne({ _id: req.params.projectId, workspaceId: req.user.workspaceId }));
         res.json({
             success: true,
             message: 'Team member(s) added',
@@ -159,13 +158,13 @@ exports.addTeamMember = async (req, res) => {
 exports.removeTeamMember = async (req, res) => {
     try {
         const { userId } = req.params;
-        const project = await Project.findById(req.params.projectId);
+        const project = await Project.findOne({ _id: req.params.projectId, workspaceId: req.user.workspaceId });
         if (!project) return res.status(404).json({ message: 'Project not found' });
 
         project.teamMembers = project.teamMembers.filter(id => id.toString() !== userId);
         await project.save();
 
-        const updatedProject = await populateProjectTeam(Project.findById(req.params.projectId));
+        const updatedProject = await populateProjectTeam(Project.findOne({ _id: req.params.projectId, workspaceId: req.user.workspaceId }));
         res.json({
             success: true,
             message: 'Team member removed',

@@ -110,7 +110,7 @@ export default function ProjectDocuments({ projectId }: { projectId: string }) {
 
   return (
     <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm overflow-hidden flex flex-col h-full">
-      <div className="p-6 border-b border-[#E5DED6] flex justify-between items-center">
+      <div className="flex flex-col gap-4 border-b border-[#E5DED6] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
           <h2 className="text-xl font-bold text-[#1F2937]">Documents</h2>
           <p className="text-[#6B7280] text-sm mt-1">Manage project drawings, photos, and reports.</p>
@@ -126,7 +126,7 @@ export default function ProjectDocuments({ projectId }: { projectId: string }) {
             />
             <label 
               htmlFor="doc-upload" 
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors cursor-pointer text-sm font-medium ${isUploading ? 'bg-gray-300 text-gray-500' : 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]'}`}
+              className={`flex cursor-pointer items-center justify-center space-x-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${isUploading ? 'bg-gray-300 text-gray-500' : 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]'}`}
             >
               <Upload className="w-4 h-4" />
               <span>{isUploading ? 'Uploading...' : 'Upload Document'}</span>
@@ -135,7 +135,7 @@ export default function ProjectDocuments({ projectId }: { projectId: string }) {
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         {loading ? (
           <div className="text-center py-8">Loading documents...</div>
         ) : documents.length === 0 ? (

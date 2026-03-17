@@ -21,10 +21,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Projects from './pages/Projects';
 import ProjectWorkspace from './pages/ProjectWorkspace';
 import { Toaster } from 'react-hot-toast';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />

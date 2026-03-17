@@ -98,7 +98,7 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
 
   return (
     <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm overflow-hidden h-full flex flex-col">
-      <div className="p-6 border-b border-[#E5DED6] flex justify-between items-center">
+      <div className="flex flex-col gap-4 border-b border-[#E5DED6] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
           <h2 className="text-xl font-bold text-[#1F2937]">Project Team</h2>
           <p className="text-[#6B7280] text-sm mt-1">People who have access to this project.</p>
@@ -109,7 +109,7 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
               setIsAddModalOpen(true);
               setMemberSearch('');
             }}
-            className="flex items-center space-x-2 px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors text-sm font-medium"
+            className="flex items-center justify-center space-x-2 rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8]"
           >
             <Plus className="w-4 h-4" />
             <span>Add Team Member</span>
@@ -117,7 +117,7 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
         )}
       </div>
       
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         {loading ? (
           <div className="text-center py-8">Loading team...</div>
         ) : team.length === 0 ? (
@@ -162,8 +162,8 @@ export default function ProjectTeam({ projectId }: { projectId: string }) {
 
       {/* Add Member Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="mx-4 max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
             <h2 className="text-xl font-bold text-[#1F2937] mb-4">Add to Project</h2>
             <form onSubmit={handleAddMember} className="space-y-4">
               <div>

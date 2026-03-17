@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
-import { Plus, Trash2, FileText, Download } from 'lucide-react';
-import api from '../lib/api';
+import { useEffect, useState } from 'react';
+import { Download, FileText, Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import AppShell from '../components/AppShell';
+import api from '../lib/api';
 
 export default function Documents() {
   const [documents, setDocuments] = useState<any[]>([]);
@@ -50,8 +50,8 @@ export default function Documents() {
       const config = {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       };
       const response = await api.post('/documents', formData, config);
 
@@ -93,65 +93,64 @@ export default function Documents() {
   };
 
   return (
-    <div className="flex h-screen bg-[#F6F3EE]">
-      <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-[#1F2937] mb-2">Documents</h1>
-              <p className="text-[#6B7280]">Manage all your project files, reports, and certifications.</p>
-            </div>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors flex items-center gap-2 shadow-sm"
-            >
-              <Plus className="w-5 h-5" /> Upload Document
-            </button>
-          </div>
+    <AppShell>
+      <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="mb-2 text-2xl font-bold text-[#1F2937] sm:text-3xl">Documents</h1>
+          <p className="text-sm text-[#6B7280] sm:text-base">Manage all your project files, reports, and certifications.</p>
+        </div>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2 text-white shadow-sm transition-colors hover:bg-[#1D4ED8] sm:w-auto"
+        >
+          <Plus className="w-5 h-5" /> Upload Document
+        </button>
+      </div>
 
-          <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm overflow-hidden">
-            {loading ? (
-              <div className="p-8 text-center text-[#6B7280]">Loading...</div>
-            ) : documents.length === 0 ? (
-              <div className="p-12 text-center text-[#6B7280]">
-                <FileText className="w-12 h-12 mx-auto text-[#E5DED6] mb-4" />
-                No documents found. Upload one to get started.
-              </div>
-            ) : (
+      <div className="overflow-hidden rounded-xl border border-[#E5DED6] bg-white shadow-sm">
+        {loading ? (
+          <div className="p-8 text-center text-[#6B7280]">Loading...</div>
+        ) : documents.length === 0 ? (
+          <div className="p-12 text-center text-[#6B7280]">
+            <FileText className="mx-auto mb-4 h-12 w-12 text-[#E5DED6]" />
+            No documents found. Upload one to get started.
+          </div>
+        ) : (
+          <>
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-left">
-                <thead className="bg-[#EFE9E1] border-b border-[#E5DED6]">
+                <thead className="border-b border-[#E5DED6] bg-[#EFE9E1]">
                   <tr>
                     <th className="px-6 py-4 text-sm font-semibold text-[#6B7280]">Name</th>
                     <th className="px-6 py-4 text-sm font-semibold text-[#6B7280]">Status</th>
                     <th className="px-6 py-4 text-sm font-semibold text-[#6B7280]">Date Added</th>
-                    <th className="px-6 py-4 text-sm font-semibold text-[#6B7280] text-right">Actions</th>
+                    <th className="px-6 py-4 text-right text-sm font-semibold text-[#6B7280]">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5DED6]">
                   {documents.map((doc) => (
-                    <tr key={doc._id} className="hover:bg-[#F6F3EE] transition-colors">
+                    <tr key={doc._id} className="transition-colors hover:bg-[#F6F3EE]">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-[#EFE9E1] rounded-lg">
-                            <FileText className="w-5 h-5 text-[#6B7280]" />
+                          <div className="rounded-lg bg-[#EFE9E1] p-2">
+                            <FileText className="h-5 w-5 text-[#6B7280]" />
                           </div>
                           <div>
                             <button
                               type="button"
                               onClick={() => handleOpenDocument(doc.fileUrl)}
-                              className="font-medium text-[#1F2937] hover:text-[#2563EB] hover:underline text-left"
+                              className="text-left font-medium text-[#1F2937] hover:text-[#2563EB] hover:underline"
                             >
                               {doc.title || doc.fileName}
                             </button>
-                            <p className="text-xs text-[#2563EB] truncate">{doc.fileName}</p>
+                            <p className="truncate text-xs text-[#2563EB]">{doc.fileName}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            doc.status === 'Published' ? 'bg-[#EFE9E1] text-[#1F2937] border border-[#E5DED6]' : 'bg-[#EFE9E1] text-[#6B7280] border border-[#E5DED6]'
+                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+                            doc.status === 'Published' ? 'border-[#E5DED6] bg-[#EFE9E1] text-[#1F2937]' : 'border-[#E5DED6] bg-[#EFE9E1] text-[#6B7280]'
                           }`}
                         >
                           {doc.status}
@@ -160,79 +159,134 @@ export default function Documents() {
                       <td className="px-6 py-4 text-sm text-[#6B7280]">
                         {new Date(doc.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 flex justify-end gap-2">
-                        <a
-                          href={getDocumentUrl(doc.fileUrl)}
-                          download={doc.fileName || doc.title}
-                          className="p-2 text-[#6B7280] hover:text-[#1F2937] rounded-lg transition-colors"
-                        >
-                          <Download className="w-5 h-5" />
-                        </a>
-                        <button
-                          onClick={() => handleDelete(doc._id)}
-                          className="p-2 text-red-500 hover:text-red-700 rounded-lg hover:bg-red-50 transition-colors"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                      <td className="px-6 py-4">
+                        <div className="flex justify-end gap-2">
+                          <a
+                            href={getDocumentUrl(doc.fileUrl)}
+                            download={doc.fileName || doc.title}
+                            className="rounded-lg p-2 text-[#6B7280] transition-colors hover:text-[#1F2937]"
+                          >
+                            <Download className="h-5 w-5" />
+                          </a>
+                          <button
+                            onClick={() => handleDelete(doc._id)}
+                            className="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            )}
-          </div>
-        </div>
+            </div>
+
+            <div className="space-y-4 p-4 md:hidden">
+              {documents.map((doc) => (
+                <div key={doc._id} className="rounded-xl border border-[#E5DED6] p-4">
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-start gap-3">
+                      <div className="rounded-lg bg-[#EFE9E1] p-2">
+                        <FileText className="h-5 w-5 text-[#6B7280]" />
+                      </div>
+                      <div className="min-w-0">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenDocument(doc.fileUrl)}
+                          className="text-left font-medium text-[#1F2937] hover:text-[#2563EB] hover:underline"
+                        >
+                          {doc.title || doc.fileName}
+                        </button>
+                        <p className="truncate text-xs text-[#2563EB]">{doc.fileName}</p>
+                      </div>
+                    </div>
+                    <span
+                      className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+                        doc.status === 'Published' ? 'border-[#E5DED6] bg-[#EFE9E1] text-[#1F2937]' : 'border-[#E5DED6] bg-[#EFE9E1] text-[#6B7280]'
+                      }`}
+                    >
+                      {doc.status}
+                    </span>
+                  </div>
+
+                  <p className="mb-4 text-sm text-[#6B7280]">
+                    Added on {new Date(doc.createdAt).toLocaleDateString()}
+                  </p>
+
+                  <div className="flex gap-2">
+                    <a
+                      href={getDocumentUrl(doc.fileUrl)}
+                      download={doc.fileName || doc.title}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-[#E5DED6] px-3 py-2 text-sm text-[#1F2937]"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download
+                    </a>
+                    <button
+                      onClick={() => handleDelete(doc._id)}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-            <h2 className="text-xl font-bold text-[#1F2937] mb-4">Upload Document</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+            <h2 className="mb-4 text-xl font-bold text-[#1F2937]">Upload Document</h2>
             <form onSubmit={handleCreateDocument} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#1F2937] mb-1">Document Title</label>
+                <label className="mb-1 block text-sm font-medium text-[#1F2937]">Document Title</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
+                  className="w-full rounded-lg border border-[#E5DED6] px-4 py-2 outline-none focus:ring-2 focus:ring-[#2563EB]"
                   placeholder="e.g. Safety Inspection Q1"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#1F2937] mb-1">Upload File</label>
+                <label className="mb-1 block text-sm font-medium text-[#1F2937]">Upload File</label>
                 <input
                   type="file"
                   required
                   accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
+                  className="w-full rounded-lg border border-[#E5DED6] px-4 py-2 outline-none focus:ring-2 focus:ring-[#2563EB]"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#1F2937] mb-1">Status</label>
+                <label className="mb-1 block text-sm font-medium text-[#1F2937]">Status</label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full px-4 py-2 border border-[#E5DED6] rounded-lg focus:ring-2 focus:ring-[#2563EB] outline-none"
+                  className="w-full rounded-lg border border-[#E5DED6] px-4 py-2 outline-none focus:ring-2 focus:ring-[#2563EB]"
                 >
                   <option value="Draft">Draft</option>
                   <option value="Published">Published</option>
                 </select>
               </div>
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-[#6B7280] hover:bg-[#EFE9E1] rounded-lg transition-colors"
+                  className="rounded-lg px-4 py-2 text-[#6B7280] transition-colors hover:bg-[#EFE9E1]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isUploading}
-                  className="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
+                  className="rounded-lg bg-[#2563EB] px-4 py-2 text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-50"
                 >
                   {isUploading ? 'Uploading...' : 'Upload'}
                 </button>
@@ -241,6 +295,6 @@ export default function Documents() {
           </div>
         </div>
       )}
-    </div>
+    </AppShell>
   );
 }

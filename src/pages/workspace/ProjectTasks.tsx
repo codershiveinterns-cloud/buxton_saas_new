@@ -198,12 +198,12 @@ export default function ProjectTasks({ projectId }: { projectId: string }) {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-bold text-[#1F2937]">Task Board</h2>
         {isManager && (
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center space-x-2 bg-[#2563EB] text-white px-3 py-2 rounded-lg hover:bg-[#1D4ED8] transition-colors text-sm"
+            className="flex w-full items-center justify-center space-x-2 rounded-lg bg-[#2563EB] px-3 py-2 text-sm text-white transition-colors hover:bg-[#1D4ED8] sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             <span>Add Task</span>
@@ -245,11 +245,6 @@ export default function ProjectTasks({ projectId }: { projectId: string }) {
 
                   <SortableContext items={colTasks.map(t => t._id)}>
                     <div className="flex-1 overflow-y-auto" id={col.id}>
-                       // We can use useDroppable here for strictly empty columns, but closestCorners + SortableContext is often enough 
-                       // combined with tracking the over instance in onDragEnd. Since dnd-kit can be tricky with empty columns without droppable, 
-                       // we rely on the parent ID check in over.id.
-
-                       {/* Workaround for empty column droppable without writing a separate Droppable component: */}
                        <div style={{ minHeight: '100px' }} data-dnd-droppable-id={col.id}>
                          {colTasks.map(task => (
                            <SortableTaskItem key={task._id} task={task} onClick={() => {
@@ -288,8 +283,8 @@ export default function ProjectTasks({ projectId }: { projectId: string }) {
 
       {/* Create Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="mx-4 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
             <h2 className="text-xl font-bold text-[#1F2937] mb-4">Create Task</h2>
             <form onSubmit={handleCreateTask} className="space-y-4">
               <div>
@@ -334,8 +329,8 @@ export default function ProjectTasks({ projectId }: { projectId: string }) {
 
       {/* Edit Modal */}
       {isEditModalOpen && selectedTask && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="mx-4 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
             <h2 className="text-xl font-bold text-[#1F2937] mb-4">Edit Task</h2>
             <form onSubmit={async (e) => {
               e.preventDefault();

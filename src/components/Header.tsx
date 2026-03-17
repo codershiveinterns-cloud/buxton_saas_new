@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Bell, Check } from 'lucide-react';
+import { Bell, Check, Menu } from 'lucide-react';
 import api from '../lib/api';
 import { io } from 'socket.io-client';
 
-export default function Header() {
+type HeaderProps = {
+  onOpenSidebar?: () => void;
+};
+
+export default function Header({ onOpenSidebar }: HeaderProps) {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -60,9 +64,17 @@ export default function Header() {
   };
 
   return (
-    <div className="bg-white h-16 border-b border-[#E5DED6] flex items-center justify-end px-6 sticky top-0 z-40">
-      
-      <div className="relative">
+    <div className="sticky top-0 z-20 flex h-16 items-center overflow-visible border-b border-[#E5DED6] bg-white px-4 sm:px-6">
+      <button
+        type="button"
+        onClick={onOpenSidebar}
+        className="rounded-lg p-2 text-[#6B7280] transition-colors hover:bg-[#EFE9E1] hover:text-[#1F2937] md:hidden"
+        aria-label="Open sidebar"
+      >
+        <Menu className="h-6 w-6" />
+      </button>
+
+      <div className="relative ml-auto flex shrink-0 items-center justify-end overflow-visible">
         <button 
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="relative p-2 rounded-full hover:bg-[#EFE9E1] transition-colors"
@@ -74,11 +86,11 @@ export default function Header() {
         </button>
 
         {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-[#E5DED6] overflow-hidden z-50">
-            <div className="p-4 border-b border-[#E5DED6] flex justify-between items-center bg-[#F6F3EE]">
-              <h3 className="font-semibold text-[#1F2937]">Notifications</h3>
+          <div className="absolute top-full left-1/2 z-50 mt-2 w-[min(calc(100vw-2rem),24rem)] max-w-[calc(100vw-2rem)] -translate-x-1/2 overflow-hidden rounded-xl border border-[#E5DED6] bg-white shadow-xl md:left-auto md:right-0 md:w-80 md:max-w-80 md:translate-x-0">
+            <div className="flex items-center justify-between gap-3 border-b border-[#E5DED6] bg-[#F6F3EE] p-4">
+              <h3 className="min-w-0 font-semibold text-[#1F2937]">Notifications</h3>
               {unreadCount > 0 && (
-                <button onClick={markAllRead} className="text-xs text-[#2563EB] hover:underline flex items-center">
+                <button onClick={markAllRead} className="flex shrink-0 items-center text-xs text-[#2563EB] hover:underline">
                   <Check className="w-3 h-3 mr-1" /> Mark all read
                 </button>
               )}

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
 import Notepad from '../components/Notepad';
+import AppShell from '../components/AppShell';
 import {
   FileText,
   CheckSquare,
@@ -224,37 +223,32 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-[#F6F3EE]">
-      <Sidebar />
-
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        
-        <div className="flex-1 overflow-auto">
+    <AppShell>
+      <div className="flex-1 overflow-auto">
         {loading ? (
           <div className="flex items-center justify-center h-full text-gray-500 font-medium">
             Loading dashboard...
           </div>
         ) : (
-          <div className="flex flex-col p-8 space-y-8">
+          <div className="flex flex-col space-y-6 sm:space-y-8">
             {/* Welcome Section */}
             <div>
-              <h1 className="text-3xl font-bold text-[#1F2937] mb-2">
+              <h1 className="mb-2 text-2xl font-bold text-[#1F2937] sm:text-3xl">
                 Welcome back, {user?.name ? user.name.split(' ')[0] : 'User'}
               </h1>
-              <p className="text-[#6B7280]">
+              <p className="text-sm text-[#6B7280] sm:text-base">
                 Here's what's happening with your projects today.
               </p>
             </div>
 
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
             {stats.map((stat: any, index: number) => {
               const Icon = stat.icon;
               return (
                 <div
                   key={index}
-                  className="bg-white rounded-xl border border-[#E5DED6] p-6 shadow-sm"
+                  className="rounded-xl border border-[#E5DED6] bg-white p-4 shadow-sm sm:p-6"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="w-10 h-10 bg-[#EFE9E1] rounded-lg flex items-center justify-center">
@@ -273,11 +267,11 @@ export default function Dashboard() {
             })}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
-              <div className="flex items-center justify-between mb-6">
+          <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="rounded-xl border border-[#E5DED6] bg-white p-4 shadow-sm sm:p-6">
+              <div className="mb-6 flex items-center justify-between gap-3">
                 <Link to="/documents" className="hover:opacity-70 transition-opacity">
-                  <h2 className="text-lg font-semibold text-[#1F2937] cursor-pointer">
+                  <h2 className="cursor-pointer text-base font-semibold text-[#1F2937] sm:text-lg">
                     Recent Documents
                   </h2>
                 </Link>
@@ -295,14 +289,14 @@ export default function Dashboard() {
                   recentDocuments.map((doc: any, index: number) => (
                     <div
                       key={index}
-                      className="flex items-start justify-between p-3 hover:bg-[#EFE9E1] rounded-lg transition-colors cursor-pointer"
+                      className="flex cursor-pointer flex-col gap-3 rounded-lg p-3 transition-colors hover:bg-[#EFE9E1] sm:flex-row sm:items-start sm:justify-between"
                       onClick={() => window.open(`${api.defaults.baseURL?.replace('/api', '')}${doc.fileUrl}`, '_blank')}
                     >
                       <div className="flex items-start space-x-3">
                         <div className="w-10 h-10 bg-[#EFE9E1] rounded-lg flex items-center justify-center flex-shrink-0">
                           <FileText className="w-5 h-5 text-[#6B7280]" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <p className="font-medium text-[#1F2937] text-sm">
                             {doc.title}
                           </p>
@@ -310,7 +304,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full ${
+                        className={`w-fit text-xs px-2 py-1 rounded-full ${
                           doc.status === 'Published'
                             ? 'bg-green-50 text-green-700 ring-1 ring-green-600/20'
                             : 'bg-gray-50 text-gray-700 ring-1 ring-gray-600/20'
@@ -324,10 +318,10 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
-              <div className="flex items-center justify-between mb-6">
+            <div className="rounded-xl border border-[#E5DED6] bg-white p-4 shadow-sm sm:p-6">
+              <div className="mb-6 flex items-center justify-between gap-3">
                 <Link to="/projects" className="hover:opacity-70 transition-opacity">
-                  <h2 className="text-lg font-semibold text-[#1F2937] cursor-pointer">
+                  <h2 className="cursor-pointer text-base font-semibold text-[#1F2937] sm:text-lg">
                     Active Projects
                   </h2>
                 </Link>
@@ -345,7 +339,7 @@ export default function Dashboard() {
                   activeProjects.map((project: any, index: number) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-3 hover:bg-[#EFE9E1] rounded-lg transition-colors cursor-pointer"
+                      className="flex cursor-pointer flex-col gap-3 rounded-lg p-3 transition-colors hover:bg-[#EFE9E1] sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div className="flex items-center space-x-3">
                         <FolderOpen className="w-4 h-4 text-[#2563EB]" />
@@ -368,10 +362,10 @@ export default function Dashboard() {
             </div>
 
             {/* Bottom Row: Activity and Notepad */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6 h-[400px] flex flex-col">
-              <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-[#1F2937]">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="flex h-[400px] flex-col rounded-xl border border-[#E5DED6] bg-white p-4 shadow-sm sm:p-6">
+              <div className="mb-6 flex items-center justify-between gap-3">
+              <h2 className="text-base font-semibold text-[#1F2937] sm:text-lg">
                 Recent Team Activity
               </h2>
               <button className="p-2 hover:bg-[#EFE9E1] rounded-lg transition-colors">
@@ -409,12 +403,11 @@ export default function Dashboard() {
           </div>
         </div>
         )}
-        </div>
       </div>
 
       {isTaskModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
             <h2 className="text-xl font-bold text-[#1F2937] mb-4">Create New Task</h2>
             <form onSubmit={handleCreateTask} className="space-y-4">
               <div>
@@ -466,8 +459,8 @@ export default function Dashboard() {
       )}
 
       {isDocModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
             <h2 className="text-xl font-bold text-[#1F2937] mb-4">Upload Document</h2>
             <form onSubmit={handleUploadDocument} className="space-y-4">
               <div>
@@ -493,6 +486,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-    </div>
+    </AppShell>
   );
 }

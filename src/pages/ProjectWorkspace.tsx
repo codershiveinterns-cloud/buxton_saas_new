@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, Routes, Route, useLocation } from 'react-router-dom';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
+import AppShell from '../components/AppShell';
 import api from '../lib/api';
 import { toast } from 'react-hot-toast';
 
@@ -54,18 +53,14 @@ export default function ProjectWorkspace() {
   if (!project) return <div className="flex justify-center items-center h-screen bg-[#F6F3EE]">Project Not Found</div>;
 
   return (
-    <div className="flex h-screen bg-[#F6F3EE]">
-      <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        
-        <main className="flex-1 overflow-y-auto">
+    <AppShell contentClassName="">
+      <main className="flex-1 overflow-y-auto">
           {/* Project Header */}
-          <div className="bg-white border-b border-[#E5DED6] px-6 py-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="border-b border-[#E5DED6] bg-white px-4 py-5 sm:px-6 sm:py-6">
+            <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-[#1F2937]">{project.name}</h1>
-                <p className="text-[#6B7280]">{project.clientName} - {project.location}</p>
+                <p className="text-sm text-[#6B7280] sm:text-base">{project.clientName} - {project.location}</p>
               </div>
               <select
                 value={project.status}
@@ -82,7 +77,7 @@ export default function ProjectWorkspace() {
                     toast.error('Failed to update status');
                   }
                 }}
-                className={`px-4 py-2 pr-8 rounded-full text-sm font-medium outline-none appearance-none cursor-pointer border-none bg-no-repeat ${
+                className={`w-full rounded-full border-none bg-no-repeat px-4 py-2 pr-8 text-sm font-medium outline-none appearance-none cursor-pointer sm:w-auto ${
                   project.status === 'Completed' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
                   project.status === 'In Progress' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' :
                   'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
@@ -100,7 +95,8 @@ export default function ProjectWorkspace() {
             </div>
             
             {/* Tabs Navigation */}
-            <nav className="flex space-x-8">
+            <nav className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <div className="flex min-w-max space-x-6 sm:space-x-8">
               {tabs.map((tab) => (
                 <Link
                   key={tab.name}
@@ -114,11 +110,12 @@ export default function ProjectWorkspace() {
                   {tab.name}
                 </Link>
               ))}
+              </div>
             </nav>
           </div>
 
           {/* Tab Content Area */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <Routes>
               <Route path="/" element={<ProjectTasks projectId={id || ''} />} />
               <Route path="tasks" element={<ProjectTasks projectId={id || ''} />} />
@@ -128,7 +125,6 @@ export default function ProjectWorkspace() {
             </Routes>
           </div>
         </main>
-      </div>
-    </div>
+    </AppShell>
   );
 }

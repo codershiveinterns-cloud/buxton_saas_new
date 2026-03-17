@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
+import AppShell from '../components/AppShell';
 import { Plus, Trash2, Calendar, MessageSquare, Send, X, CheckCircle, ChevronRight, Pencil } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
@@ -247,28 +247,25 @@ export default function Tasks() {
   };
 
   return (
-    <div className="flex h-screen bg-[#F6F3EE]">
-      <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
+    <AppShell>
           {/* Main Breadcrumb */}
-          <div className="flex items-center text-sm text-gray-500 mb-4">
+          <div className="mb-4 flex items-center overflow-x-auto text-sm text-gray-500">
             <Link to="/dashboard" className="hover:text-gray-800 transition-colors">Dashboard</Link>
             <ChevronRight className="w-4 h-4 mx-2" />
             <span className="text-[#1F2937] font-medium">Tasks</span>
           </div>
 
-          <div className="flex justify-between items-center mb-8">
+          <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <h1 className="text-3xl font-bold text-[#1F2937] mb-2">{isManager ? 'Tasks' : 'My Tasks'}</h1>
-              <p className="text-[#6B7280]">
+              <h1 className="mb-2 text-2xl font-bold text-[#1F2937] sm:text-3xl">{isManager ? 'Tasks' : 'My Tasks'}</h1>
+              <p className="text-sm text-[#6B7280] sm:text-base">
                 {isManager ? 'Track and assign work to your team members.' : 'View your assigned work and discuss details.'}
               </p>
             </div>
             {isManager && (
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-[#1D4ED8] transition-colors flex items-center gap-2 shadow-sm"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2 text-white shadow-sm transition-colors hover:bg-[#1D4ED8] sm:w-auto"
               >
                 <Plus className="w-5 h-5" /> New Task
               </button>
@@ -276,7 +273,8 @@ export default function Tasks() {
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex space-x-1 border-b border-[#E5DED6] mb-6">
+          <div className="mb-6 overflow-x-auto border-b border-[#E5DED6]">
+            <div className="flex min-w-max space-x-1">
             {(['All', 'Active', 'Completed'] as const).map((f) => (
               <button
                 key={f}
@@ -290,6 +288,7 @@ export default function Tasks() {
                 {f}
               </button>
             ))}
+            </div>
           </div>
 
           <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm overflow-hidden">
@@ -301,7 +300,8 @@ export default function Tasks() {
                 No tasks found.
               </div>
             ) : (
-              <table className="w-full text-left">
+              <div className="overflow-x-auto">
+              <table className="min-w-[960px] w-full text-left">
                 <thead className="bg-[#EFE9E1] border-b border-[#E5DED6]">
                   <tr>
                     <th className="px-6 py-4 text-sm font-semibold text-[#6B7280] w-32">Status</th>
@@ -384,10 +384,10 @@ export default function Tasks() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
-        </div>
-      </div>
+        
 
       {/* Task Discussion Modal */}
       {selectedTask && (
@@ -690,6 +690,6 @@ export default function Tasks() {
           </div>
         </div>
       )}
-    </div>
+    </AppShell>
   );
 }

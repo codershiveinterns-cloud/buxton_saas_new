@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
+import AppShell from '../components/AppShell';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
 
@@ -71,18 +71,16 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex h-screen bg-[#F6F3EE]">
-      <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="p-8 max-w-4xl">
+    <AppShell contentClassName="p-4 sm:p-6">
+        <div className="max-w-4xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-[#1F2937] mb-2">Settings</h1>
-            <p className="text-[#6B7280]">Manage your profile, security, and preferences.</p>
+            <h1 className="mb-2 text-2xl font-bold text-[#1F2937] sm:text-3xl">Settings</h1>
+            <p className="text-sm text-[#6B7280] sm:text-base">Manage your profile, security, and preferences.</p>
           </div>
 
           <div className="space-y-8">
             {/* Profile Settings */}
-            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
+            <div className="rounded-xl border border-[#E5DED6] bg-white p-4 shadow-sm sm:p-6">
               <h2 className="text-xl font-bold text-[#1F2937] mb-4">Profile Information</h2>
               <form onSubmit={handleUpdateProfile} className="space-y-4 max-w-lg">
                 <div>
@@ -119,7 +117,7 @@ export default function Settings() {
             </div>
 
             {/* Password Settings */}
-            <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
+            <div className="rounded-xl border border-[#E5DED6] bg-white p-4 shadow-sm sm:p-6">
               <h2 className="text-xl font-bold text-[#1F2937] mb-4">Security</h2>
               <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-lg">
                 <div>
@@ -162,7 +160,7 @@ export default function Settings() {
 
             {/* Company Options - Managers Only */}
             {isManager && (
-              <div className="bg-white rounded-xl border border-[#E5DED6] shadow-sm p-6">
+              <div className="rounded-xl border border-[#E5DED6] bg-white p-4 shadow-sm sm:p-6">
                 <h2 className="text-xl font-bold text-[#1F2937] mb-4">Company Details</h2>
                 <form onSubmit={handleUpdateCompany} className="space-y-4 max-w-lg">
                   <div>
@@ -192,7 +190,6 @@ export default function Settings() {
 
           </div>
         </div>
-      </div>
-    </div>
+    </AppShell>
   );
 }

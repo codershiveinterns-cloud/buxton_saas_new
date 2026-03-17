@@ -2,15 +2,48 @@ const nodemailer = require('nodemailer');
 
 let transporter;
 
-const isMailConfigured = () => Boolean(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const getMailCredentials = () => ({
+    user: process.env.EMAIL_USER || process.env.GMAIL_USER,
+    pass: process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD
+});
+
+const normalizeRecipients = (to) => {
+    const rawRecipients = Array.isArray(to)
+        ? to
+        : typeof to === 'string'
+            ? to.split(',')
+            : [];
+
+    const recipients = [...new Set(rawRecipients.map((email) => email?.trim().toLowerCase()).filter(Boolean))];
+    const invalidRecipients = recipients.filter((email) => !EMAIL_REGEX.test(email));
+
+    if (invalidRecipients.length > 0) {
+        throw new Error(`Invalid email recipient(s): ${invalidRecipients.join(', ')}`);
+    }
+
+    return recipients;
+};
+
+const isMailConfigured = () => {
+    const credentials = getMailCredentials();
+    return Boolean(credentials.user && credentials.pass);
+};
 
 const getTransporter = () => {
     if (!transporter) {
+        const credentials = getMailCredentials();
+
+        if (!credentials.user || !credentials.pass) {
+            throw new Error('EMAIL_USER and EMAIL_PASS must be configured for Gmail SMTP');
+        }
+
         transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.GMAIL_USER,
-                pass: process.env.GMAIL_APP_PASSWORD
+                user: credentials.user,
+                pass: credentials.pass
             }
         });
     }
@@ -19,26 +52,31 @@ const getTransporter = () => {
 };
 
 const sendMail = async ({ to, subject, html, text }) => {
-    const recipients = Array.isArray(to) ? to.filter(Boolean) : [to].filter(Boolean);
+    const recipients = normalizeRecipients(to);
 
     if (recipients.length === 0) {
-        return { sent: false, skipped: true, reason: 'No recipients supplied' };
+        throw new Error('No email recipients supplied');
     }
 
     if (!isMailConfigured()) {
-        console.warn('[Mail] Gmail credentials are not configured. Skipping email send.');
-        return { sent: false, skipped: true, reason: 'Mail transport is not configured' };
+        throw new Error('EMAIL_USER and EMAIL_PASS are not configured');
     }
 
-    await getTransporter().sendMail({
-        from: process.env.MAIL_FROM || process.env.GMAIL_USER,
-        to: recipients.join(','),
-        subject,
-        text,
-        html
-    });
+    try {
+        const credentials = getMailCredentials();
+        const info = await getTransporter().sendMail({
+            from: process.env.MAIL_FROM || credentials.user,
+            to: recipients.join(','),
+            subject,
+            text,
+            html
+        });
 
-    return { sent: true };
+        return { sent: true, messageId: info.messageId };
+    } catch (error) {
+        console.error('[Mail] Failed to send email:', error);
+        throw error;
+    }
 };
 
 module.exports = {

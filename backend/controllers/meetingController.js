@@ -2,8 +2,21 @@ const Meeting = require('../models/Meeting');
 const { sendMail } = require('../utils/sendMail');
 
 const normalizeEmail = (email = '') => email.trim().toLowerCase();
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const sortMeetings = (query) => query.sort({ date: 1, time: 1, createdAt: -1 });
+
+const parseTeamMembers = (teamMembers) => {
+    if (Array.isArray(teamMembers)) {
+        return teamMembers;
+    }
+
+    if (typeof teamMembers === 'string') {
+        return teamMembers.split(',');
+    }
+
+    return [];
+};
 
 const buildMeetingEmail = (meeting) => {
     const dateText = new Date(meeting.date).toLocaleDateString(undefined, {
@@ -50,8 +63,16 @@ exports.createMeeting = async (req, res) => {
         }
 
         const creatorEmail = normalizeEmail(req.user.email);
-        const recipientList = Array.isArray(teamMembers) ? teamMembers : [];
+        const recipientList = parseTeamMembers(teamMembers);
         const normalizedTeamMembers = [...new Set(recipientList.map(normalizeEmail).filter(Boolean))];
+        const invalidEmails = normalizedTeamMembers.filter((email) => !EMAIL_REGEX.test(email));
+
+        if (invalidEmails.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid team member email(s): ${invalidEmails.join(', ')}`
+            });
+        }
 
         const meeting = await Meeting.create({
             title: title.trim(),
@@ -66,7 +87,7 @@ exports.createMeeting = async (req, res) => {
         const mailRecipients = [...new Set([...normalizedTeamMembers, creatorEmail])];
         const emailContent = buildMeetingEmail(meeting);
 
-        let mailResult = { sent: false, skipped: true };
+        let mailResult = { sent: false, skipped: false, reason: '' };
         try {
             mailResult = await sendMail({
                 to: mailRecipients,
@@ -76,7 +97,11 @@ exports.createMeeting = async (req, res) => {
             });
         } catch (mailError) {
             console.error('Meeting email error:', mailError);
-            mailResult = { sent: false, skipped: false, reason: 'Failed to send emails' };
+            mailResult = {
+                sent: false,
+                skipped: false,
+                reason: mailError.message || 'Failed to send emails'
+            };
         }
 
         res.status(201).json({
@@ -85,7 +110,7 @@ exports.createMeeting = async (req, res) => {
             emailStatus: mailResult,
             message: mailResult.sent
                 ? 'Meeting created and email invitations sent'
-                : 'Meeting created successfully'
+                : 'Meeting created, but email invitations could not be sent'
         });
     } catch (error) {
         console.error('Create meeting error:', error);

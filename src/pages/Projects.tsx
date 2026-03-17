@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { Plus, Folder } from 'lucide-react';
-import axios from 'axios';
+import api from '../lib/api';
 import { toast } from 'react-hot-toast';
 
 export default function Projects() {
@@ -27,7 +27,7 @@ export default function Projects() {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/projects', {
+      const response = await api.get('/projects', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -45,7 +45,7 @@ export default function Projects() {
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/projects', formData, {
+      const response = await api.post('/projects', formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }

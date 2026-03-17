@@ -16,7 +16,7 @@ export default function Header() {
     
     if (token && userStr) {
        const user = JSON.parse(userStr);
-       const baseURL = api.defaults.baseURL || 'http://localhost:5000';
+       const baseURL = api.defaults.baseURL || import.meta.env.VITE_API_URL || '';
        const socketHost = baseURL.replace('/api', '');
        const socket = io(socketHost);
        socket.emit('register', user.id);

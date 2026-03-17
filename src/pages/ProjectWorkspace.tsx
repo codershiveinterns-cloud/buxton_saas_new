@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, Routes, Route, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import axios from 'axios';
+import api from '../lib/api';
 import { toast } from 'react-hot-toast';
 
 // Placeholder components for tabs
@@ -23,7 +23,7 @@ export default function ProjectWorkspace() {
 
   const fetchProject = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/projects/${id}`, {
+      const response = await api.get(`/projects/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -73,7 +73,7 @@ export default function ProjectWorkspace() {
                   const newStatus = e.target.value;
                   try {
                     const token = localStorage.getItem('token');
-                    await axios.put(`http://localhost:5000/api/projects/${id}`, { status: newStatus }, {
+                    await api.put(`/projects/${id}`, { status: newStatus }, {
                       headers: { Authorization: `Bearer ${token}` }
                     });
                     setProject({ ...project, status: newStatus });

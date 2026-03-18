@@ -45,7 +45,10 @@ export default function Security() {
                 Enterprise-Grade Security
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                At BUXTON SCAFFOLDING LTD, the security and reliability of your data is our highest priority. We employ state-of-the-art security practices to ensure your construction and productivity data remains strictly confidential and continuously available.
+                At ZENTIVORA TECHNOLOGIES LTD, the security and reliability of
+                your data is our highest priority. We employ state-of-the-art
+                security practices to ensure your construction and productivity
+                data remains strictly confidential and continuously available.
               </p>
             </div>
 
@@ -54,11 +57,16 @@ export default function Security() {
                 Data Encryption
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                Any data that travels between your device and our servers is encrypted in transit using industry-standard TLS 1.3 (Transport Layer Security).
+                Any data that travels between your device and our servers is
+                encrypted in transit using industry-standard TLS 1.3 (Transport
+                Layer Security).
               </p>
               <ul className="list-disc list-inside text-gray-500 space-y-2 mb-4">
                 <li>Data at rest is encrypted using AES-256 encryption.</li>
-                <li>Encryption keys are strictly managed and rotated frequently using hardware security modules (HSMs).</li>
+                <li>
+                  Encryption keys are strictly managed and rotated frequently
+                  using hardware security modules (HSMs).
+                </li>
                 <li>Database instances and file backups are identically secured.</li>
               </ul>
             </div>
@@ -68,12 +76,22 @@ export default function Security() {
                 Infrastructure Security
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                Our infrastructure resides in secure AWS data centers protected by biometric locks, armed guards, and surveillance. 
+                Our infrastructure resides in secure AWS data centers protected
+                by biometric locks, armed guards, and surveillance.
               </p>
               <ul className="list-disc list-inside text-gray-500 space-y-2">
-                <li>We deploy across multiple availability zones to ensure fault tolerance.</li>
-                <li>Our VPCs (Virtual Private Clouds) isolate our databases entirely from public internet access.</li>
-                <li>We conduct regular disaster recovery exercises and backup integrity checks.</li>
+                <li>
+                  We deploy across multiple availability zones to ensure fault
+                  tolerance.
+                </li>
+                <li>
+                  Our VPCs (Virtual Private Clouds) isolate our databases
+                  entirely from public internet access.
+                </li>
+                <li>
+                  We conduct regular disaster recovery exercises and backup
+                  integrity checks.
+                </li>
               </ul>
             </div>
 
@@ -82,10 +100,14 @@ export default function Security() {
                 Access Controls
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                We employ the principle of least privilege (PoLP) internally. Access to production environments is strictly limited to authorized senior engineers requiring it to maintain platform operations. 
+                We employ the principle of least privilege (PoLP) internally.
+                Access to production environments is strictly limited to
+                authorized senior engineers requiring it to maintain platform
+                operations.
               </p>
               <p className="text-gray-500 leading-relaxed">
-                Multi-factor authentication (MFA) is strictly enforced across all internal operational services.
+                Multi-factor authentication (MFA) is strictly enforced across
+                all internal operational services.
               </p>
             </div>
 
@@ -94,10 +116,13 @@ export default function Security() {
                 Vulnerability Reporting
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                We believe that working closely with the security research community helps keep our users safer. 
+                We believe that working closely with the security research
+                community helps keep our users safer.
               </p>
               <p className="text-gray-500 leading-relaxed">
-                If you have discovered a security vulnerability on BUXTON SCAFFOLDING LTD, we encourage you to contact us immediately on our secure reporting line.
+                If you have discovered a security vulnerability on ZENTIVORA
+                TECHNOLOGIES LTD, we encourage you to contact us immediately on
+                our secure reporting line.
               </p>
             </div>
 
@@ -109,9 +134,11 @@ export default function Security() {
                 To report an incident or inquire about our security policies:
               </p>
               <ul className="text-gray-500 space-y-2">
-                <li>Email: security@buxtonscaffolding.com</li>
-                <li>Company: BUXTON SCAFFOLDING LTD (Company Number: 15873158)</li>
-                <li>Address: 27 Kinder Way, Fairfield, Buxton, England, SK17 7TP</li>
+                <li>Email: security@zentivora.com</li>
+                <li>
+                  Company: ZENTIVORA TECHNOLOGIES LTD (Company Number: 17049974)
+                </li>
+                <li>Address: 28, City Road, London, EC1V 2NX, United Kingdom</li>
               </ul>
             </div>
           </div>

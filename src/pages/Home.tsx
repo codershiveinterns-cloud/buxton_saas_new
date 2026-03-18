@@ -65,7 +65,7 @@ export default function Home() {
   const testimonials = [
     {
       quote:
-        "BUXTON has transformed how we manage our scaffolding projects. The platform is intuitive and has saved us countless hours.",
+        "ZENTIVORA has transformed how we manage our scaffolding projects. The platform is intuitive and has saved us countless hours.",
       author: 'James Mitchell',
       role: 'Project Manager',
       company: 'BuildRight Construction',
@@ -81,7 +81,7 @@ export default function Home() {
     },
     {
       quote:
-        'Amazing platform! Our team productivity has increased significantly since we started using BUXTON.',
+        'Amazing platform! Our team productivity has increased significantly since we started using ZENTIVORA.',
       author: 'Michael Chen',
       role: 'Operations Director',
       company: 'Summit Projects',
@@ -204,7 +204,7 @@ export default function Home() {
             </h2>
             <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
               See what our customers have to say about their experience with
-              BUXTON.
+              ZENTIVORA.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

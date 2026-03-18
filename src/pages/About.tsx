@@ -11,7 +11,7 @@ export default function About() {
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-800 mb-6">
-            About BUXTON SCAFFOLDING
+            About ZENTIVORA TECHNOLOGIES
           </h1>
           <p className="text-xl text-gray-500 leading-relaxed">
             We're on a mission to revolutionize how construction teams manage
@@ -30,21 +30,25 @@ export default function About() {
               </h2>
               <div className="space-y-4 text-gray-500 leading-relaxed">
                 <p>
-                  BUXTON SCAFFOLDING LTD – Company Number: 15873158<br/>
-                  Incorporated on 2 August 2024.<br/><br/>
-                  We emerged from a simple observation: construction teams were struggling with outdated
-                  tools to manage complex scaffolding projects.
+                  ZENTIVORA TECHNOLOGIES LTD - Company Number: 17049974
+                  <br />
+                  Incorporated on 24 February 2026.
+                  <br />
+                  <br />
+                  We emerged from a simple observation: construction teams were
+                  struggling with outdated tools to manage complex scaffolding
+                  projects.
                 </p>
                 <p>
                   We knew there had to be a better way. So we built a platform
-                  that combines powerful project management features with
-                  safety compliance tools, all wrapped in a beautiful,
-                  easy-to-use interface.
+                  that combines powerful project management features with safety
+                  compliance tools, all wrapped in a beautiful, easy-to-use
+                  interface.
                 </p>
                 <p>
-                  Today, thousands of teams across the globe trust BUXTON to
-                  manage their scaffolding operations, ensuring safety,
-                  efficiency, and seamless collaboration.
+                  Today, teams across the globe trust ZENTIVORA to manage their
+                  scaffolding operations, ensuring safety, efficiency, and
+                  seamless collaboration.
                 </p>
               </div>
             </div>
@@ -96,7 +100,7 @@ export default function About() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">
-            Why Choose BUXTON?
+            Why Choose ZENTIVORA?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             <div>
@@ -145,7 +149,7 @@ export default function About() {
           </h2>
           <p className="text-xl text-gray-300 mb-10">
             Become part of a growing community of construction professionals
-            using BUXTON to transform their projects.
+            using ZENTIVORA to transform their projects.
           </p>
           <a
             href="/signup"

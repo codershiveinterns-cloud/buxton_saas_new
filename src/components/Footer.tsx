@@ -12,7 +12,7 @@ export default function Footer() {
                 <Hammer className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-800 tracking-tight">
-                BUXTON SCAFFOLDING
+                ZENTIVORA TECHNOLOGIES
               </span>
             </div>
             <p className="text-base text-gray-500 mb-8 max-w-sm leading-relaxed">
@@ -164,14 +164,17 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-200">
           <div className="flex flex-col items-center justify-center space-y-1 mb-4">
             <p className="text-sm text-gray-500 text-center font-medium">
-              BUXTON SCAFFOLDING LTD – Company Number: 15873158 | Incorporated on 2 August 2024
+              ZENTIVORA TECHNOLOGIES LTD - Company Number: 17049974
             </p>
             <p className="text-sm text-gray-500 text-center">
-              27 Kinder Way, Fairfield, Buxton, England, SK17 7TP
+              Incorporated on 24 February 2026
+            </p>
+            <p className="text-sm text-gray-500 text-center">
+              28, City Road, London, EC1V 2NX, United Kingdom
             </p>
           </div>
           <p className="text-sm text-gray-500 text-center">
-            &copy; {new Date().getFullYear()} BUXTON SCAFFOLDING LTD. All
+            &copy; {new Date().getFullYear()} ZENTIVORA TECHNOLOGIES LTD. All
             rights reserved.
           </p>
         </div>

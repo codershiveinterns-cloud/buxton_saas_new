@@ -91,7 +91,7 @@ export default function AboutProduct() {
           <h2 className="text-3xl font-bold text-gray-800 mb-6">About the Platform</h2>
           <div className="prose prose-lg prose-gray mx-auto text-gray-500 space-y-6">
             <p>
-              BUXTON SCAFFOLDING LTD provides a <strong>cloud-based SaaS productivity and collaboration platform</strong> inspired by the simplicity and power of modern digital workspaces.
+              ZENTIVORA TECHNOLOGIES LTD provides a <strong>cloud-based SaaS productivity and collaboration platform</strong> inspired by the simplicity and power of modern digital workspaces.
             </p>
             <p>
               Our platform serves as a central hub where teams can organize documents, manage complex projects, track individual tasks, and collaborate effortlessly all in one place.

@@ -45,8 +45,8 @@ export default function Policy() {
                 Introduction
               </h2>
               <p className="text-[#6B7280] leading-relaxed mb-4">
-                At BUXTON SCAFFOLDING LTD, we take your privacy seriously. This
-                Privacy Policy explains how we collect, use, disclose, and
+                At ZENTIVORA TECHNOLOGIES LTD, we take your privacy seriously.
+                This Privacy Policy explains how we collect, use, disclose, and
                 safeguard your information when you use our platform.
               </p>
               <p className="text-[#6B7280] leading-relaxed">
@@ -133,11 +133,11 @@ export default function Policy() {
               </h2>
               <p className="text-[#6B7280] leading-relaxed">
                 We may employ third-party companies and individuals to
-                facilitate our service, provide service on our behalf, or
-                assist us in analyzing how our service is used. These third
-                parties have access to your personal information only to perform
-                these tasks on our behalf and are obligated not to disclose or
-                use it for any other purpose.
+                facilitate our service, provide service on our behalf, or assist
+                us in analyzing how our service is used. These third parties
+                have access to your personal information only to perform these
+                tasks on our behalf and are obligated not to disclose or use it
+                for any other purpose.
               </p>
             </div>
 
@@ -162,9 +162,9 @@ export default function Policy() {
                 contact us:
               </p>
               <ul className="text-[#6B7280] space-y-2">
-                <li>Email: privacy@buxtonscaffolding.com</li>
+                <li>Email: privacy@zentivora.com</li>
                 <li>Phone: +44 20 1234 5678</li>
-                <li>Address: 27 Kinder Way, Fairfield, Buxton, England, SK17 7TP</li>
+                <li>Address: 28, City Road, London, EC1V 2NX, United Kingdom</li>
               </ul>
             </div>
           </div>

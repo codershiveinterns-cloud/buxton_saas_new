@@ -89,7 +89,7 @@ export default function Login() {
             Welcome back
           </h2>
           <p className="text-[#6B7280]">
-            Sign in to your BUXTON account to continue
+            Sign in to your ZENTIVORA account to continue
           </p>
         </div>
 

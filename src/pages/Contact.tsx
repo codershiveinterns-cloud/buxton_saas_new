@@ -115,10 +115,9 @@ export default function Contact() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-colors ${errors.name
-                          ? 'border-red-500'
-                          : 'border-gray-300'
-                        }`}
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-colors ${
+                        errors.name ? 'border-red-500' : 'border-gray-300'
+                      }`}
                       placeholder="Your name"
                     />
                     {errors.name && (
@@ -139,10 +138,9 @@ export default function Contact() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-colors ${errors.email
-                          ? 'border-red-500'
-                          : 'border-gray-300'
-                        }`}
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-colors ${
+                        errors.email ? 'border-red-500' : 'border-gray-300'
+                      }`}
                       placeholder="you@example.com"
                     />
                     {errors.email && (
@@ -165,10 +163,9 @@ export default function Contact() {
                       value={formData.message}
                       onChange={handleChange}
                       rows={6}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-colors resize-none ${errors.message
-                          ? 'border-red-500'
-                          : 'border-gray-300'
-                        }`}
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-colors resize-none ${
+                        errors.message ? 'border-red-500' : 'border-gray-300'
+                      }`}
                       placeholder="Tell us about your project..."
                     />
                     {errors.message && (
@@ -197,7 +194,7 @@ export default function Contact() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   Email
                 </h3>
-                <p className="text-gray-500">info@buxtonscaffolding.com</p>
+                <p className="text-gray-500">info@zentivora.com</p>
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -218,15 +215,13 @@ export default function Contact() {
                   Company Address
                 </h3>
                 <p className="text-gray-500">
-                  27 Kinder Way
+                  28, City Road
                   <br />
-                  Fairfield
+                  London
                   <br />
-                  Buxton
+                  EC1V 2NX
                   <br />
-                  England
-                  <br />
-                  SK17 7TP
+                  United Kingdom
                 </p>
               </div>
 

@@ -45,10 +45,14 @@ export default function Refund() {
                 Overview
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                At BUXTON SCAFFOLDING LTD, we strive to ensure absolute satisfaction with our productivity workspace. However, we understand that sometimes a service might not be the perfect fit for your operational needs.
+                At ZENTIVORA TECHNOLOGIES LTD, we strive to ensure absolute
+                satisfaction with our productivity workspace. However, we
+                understand that sometimes a service might not be the perfect fit
+                for your operational needs.
               </p>
               <p className="text-gray-500 leading-relaxed">
-                This document outlines the conditions under which refunds are issued to our customers.
+                This document outlines the conditions under which refunds are
+                issued to our customers.
               </p>
             </div>
 
@@ -57,11 +61,19 @@ export default function Refund() {
                 Subscription Cancellations
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                You may cancel your subscription at any time. When you cancel, you will continue to have access to the platform until the end of your current billing cycle.
+                You may cancel your subscription at any time. When you cancel,
+                you will continue to have access to the platform until the end
+                of your current billing cycle.
               </p>
               <ul className="list-disc list-inside text-gray-500 space-y-2 mb-4">
-                <li>Monthly subscriptions: Cancellation takes effect at the end of the current paid month.</li>
-                <li>Annual subscriptions: Cancellation takes effect at the end of the current paid year.</li>
+                <li>
+                  Monthly subscriptions: Cancellation takes effect at the end of
+                  the current paid month.
+                </li>
+                <li>
+                  Annual subscriptions: Cancellation takes effect at the end of
+                  the current paid year.
+                </li>
               </ul>
             </div>
 
@@ -70,12 +82,24 @@ export default function Refund() {
                 Refund Eligibility
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                We offer a 14-day money-back guarantee for all new annual subscriptions. If you are not satisfied within the first 14 days of your initial purchase, you are eligible for a full refund.
+                We offer a 14-day money-back guarantee for all new annual
+                subscriptions. If you are not satisfied within the first 14
+                days of your initial purchase, you are eligible for a full
+                refund.
               </p>
               <ul className="list-disc list-inside text-gray-500 space-y-2">
-                <li>Monthly subscriptions are generally non-refundable unless legally required.</li>
-                <li>Renewals (auto-charges) are non-refundable. We send reminder emails before annual renewals occur.</li>
-                <li>Refunds are not granted for accounts terminated due to a violation of our Terms & Conditions.</li>
+                <li>
+                  Monthly subscriptions are generally non-refundable unless
+                  legally required.
+                </li>
+                <li>
+                  Renewals (auto-charges) are non-refundable. We send reminder
+                  emails before annual renewals occur.
+                </li>
+                <li>
+                  Refunds are not granted for accounts terminated due to a
+                  violation of our Terms & Conditions.
+                </li>
               </ul>
             </div>
 
@@ -84,10 +108,13 @@ export default function Refund() {
                 Processing Times
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                Once a refund is approved by our billing team, it typically takes 5–10 business days for the funds to reflect on your original payment method. 
+                Once a refund is approved by our billing team, it typically
+                takes 5-10 business days for the funds to reflect on your
+                original payment method.
               </p>
               <p className="text-gray-500 leading-relaxed">
-                If the refund has not appeared after 14 days, please contact your banking institution before reaching back out to us.
+                If the refund has not appeared after 14 days, please contact
+                your banking institution before reaching back out to us.
               </p>
             </div>
 
@@ -96,12 +123,15 @@ export default function Refund() {
                 Requesting a Refund
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                To initiate a refund request under the eligible terms above, please reach out to our team:
+                To initiate a refund request under the eligible terms above,
+                please reach out to our team:
               </p>
               <ul className="text-gray-500 space-y-2">
-                <li>Email: billing@buxtonscaffolding.com</li>
-                <li>Company: BUXTON SCAFFOLDING LTD (Company Number: 15873158)</li>
-                <li>Address: 27 Kinder Way, Fairfield, Buxton, England, SK17 7TP</li>
+                <li>Email: billing@zentivora.com</li>
+                <li>
+                  Company: ZENTIVORA TECHNOLOGIES LTD (Company Number: 17049974)
+                </li>
+                <li>Address: 28, City Road, London, EC1V 2NX, United Kingdom</li>
               </ul>
             </div>
           </div>

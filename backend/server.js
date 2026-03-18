@@ -56,7 +56,7 @@ app.use('/api/', limiter);
 
 // Define Routes
 app.get('/', (req, res) => {
-    res.send('BUXTON Backend API Running');
+    res.send('ZENTIVORA Backend API Running');
 });
 app.get('/api/health', (req, res) => {
     res.json({ status: "Backend connected successfully" });

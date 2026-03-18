@@ -45,10 +45,13 @@ export default function Terms() {
                 Introduction
               </h2>
               <p className="text-[#6B7280] leading-relaxed mb-4">
-                Welcome to BUXTON SCAFFOLDING LTD. By accessing and using our platform, you agree to be bound by these Terms and Conditions. Please read them carefully before using our services.
+                Welcome to ZENTIVORA TECHNOLOGIES LTD. By accessing and using our
+                platform, you agree to be bound by these Terms and Conditions.
+                Please read them carefully before using our services.
               </p>
               <p className="text-[#6B7280] leading-relaxed">
-                If you do not agree with any part of these terms, you may not access our services.
+                If you do not agree with any part of these terms, you may not
+                access our services.
               </p>
             </div>
 
@@ -57,13 +60,20 @@ export default function Terms() {
                 User Responsibilities
               </h2>
               <p className="text-[#6B7280] leading-relaxed mb-4">
-                As a user of our platform, you agree to the following responsibilities:
+                As a user of our platform, you agree to the following
+                responsibilities:
               </p>
               <ul className="list-disc list-inside text-[#6B7280] space-y-2 mb-4">
                 <li>Provide accurate and complete registration information</li>
                 <li>Maintain the security of your account credentials</li>
-                <li>Ensure your use complies with all applicable local, regional, and national laws</li>
-                <li>Do not use the platform for unauthorized, illegal, or malicious activities</li>
+                <li>
+                  Ensure your use complies with all applicable local, regional,
+                  and national laws
+                </li>
+                <li>
+                  Do not use the platform for unauthorized, illegal, or
+                  malicious activities
+                </li>
               </ul>
             </div>
 
@@ -72,13 +82,17 @@ export default function Terms() {
                 Acceptable Use Policy
               </h2>
               <p className="text-[#6B7280] leading-relaxed mb-4">
-                You must not misuse our services. You are strictly prohibited from:
+                You must not misuse our services. You are strictly prohibited
+                from:
               </p>
               <ul className="list-disc list-inside text-[#6B7280] space-y-2">
                 <li>Attempting to breach our security or authentication measures</li>
                 <li>Uploading malware, viruses, or destructive code</li>
                 <li>Interfering with the proper functioning of the platform</li>
-                <li>Copying or distributing our proprietary data and intellectual property without written permission</li>
+                <li>
+                  Copying or distributing our proprietary data and intellectual
+                  property without written permission
+                </li>
               </ul>
             </div>
 
@@ -87,10 +101,15 @@ export default function Terms() {
                 Payment Terms
               </h2>
               <p className="text-[#6B7280] leading-relaxed mb-4">
-                Select features of our platform require a subscription or one-off payment. By subscribing to BUXTON SCAFFOLDING LTD, you agree to pay all applicable fees associated with the selected tier.
+                Select features of our platform require a subscription or
+                one-off payment. By subscribing to ZENTIVORA TECHNOLOGIES LTD,
+                you agree to pay all applicable fees associated with the
+                selected tier.
               </p>
               <p className="text-[#6B7280] leading-relaxed">
-                We reserve the right to modify pricing with a 30-day notice to active users. Failure to maintain up-to-date payment information may result in temporary suspension of service.
+                We reserve the right to modify pricing with a 30-day notice to
+                active users. Failure to maintain up-to-date payment
+                information may result in temporary suspension of service.
               </p>
             </div>
 
@@ -99,10 +118,16 @@ export default function Terms() {
                 Limitation of Liability
               </h2>
               <p className="text-[#6B7280] leading-relaxed mb-4">
-                To the maximum extent permitted by law, BUXTON SCAFFOLDING LTD shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues.
+                To the maximum extent permitted by law, ZENTIVORA TECHNOLOGIES
+                LTD shall not be liable for any indirect, incidental, special,
+                consequential, or punitive damages, or any loss of profits or
+                revenues.
               </p>
               <p className="text-[#6B7280] leading-relaxed">
-                Our platform is provided "as is" and "as available". We make no warranties, expressed or implied, regarding uptime, exact applicability to your unique operational workflow, or freedom from critical software bugs.
+                Our platform is provided "as is" and "as available". We make no
+                warranties, expressed or implied, regarding uptime, exact
+                applicability to your unique operational workflow, or freedom
+                from critical software bugs.
               </p>
             </div>
 
@@ -111,12 +136,15 @@ export default function Terms() {
                 Contact Us
               </h2>
               <p className="text-[#6B7280] leading-relaxed mb-4">
-                If you have any questions about these Terms, please contact us at:
+                If you have any questions about these Terms, please contact us
+                at:
               </p>
               <ul className="text-[#6B7280] space-y-2">
-                <li>Email: support@buxtonscaffolding.com</li>
-                <li>Company: BUXTON SCAFFOLDING LTD (Company Number: 15873158)</li>
-                <li>Address: 27 Kinder Way, Fairfield, Buxton, England, SK17 7TP</li>
+                <li>Email: support@zentivora.com</li>
+                <li>
+                  Company: ZENTIVORA TECHNOLOGIES LTD (Company Number: 17049974)
+                </li>
+                <li>Address: 28, City Road, London, EC1V 2NX, United Kingdom</li>
               </ul>
             </div>
           </div>

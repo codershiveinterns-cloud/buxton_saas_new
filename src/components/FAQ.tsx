@@ -3,9 +3,9 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const faqs = [
   {
-    question: 'What is Buxton Workspace?',
+    question: 'What is Zentivora Workspace?',
     answer:
-      'Buxton Workspace is a cloud-based productivity and collaboration platform designed for modern teams to organize documents, manage projects, and track tasks all in one unified interface.',
+      'Zentivora Workspace is a cloud-based productivity and collaboration platform designed for modern teams to organize documents, manage projects, and track tasks all in one unified interface.',
   },
   {
     question: 'Is there a free trial?',

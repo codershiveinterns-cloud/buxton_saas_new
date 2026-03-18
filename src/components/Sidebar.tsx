@@ -59,7 +59,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="w-8 h-8 bg-[#2563EB] rounded-lg flex items-center justify-center">
             <Hammer className="w-5 h-5 text-white" />
           </div>
-          <span className="font-semibold text-[#1F2937]">BUXTON</span>
+          <span className="font-semibold text-[#1F2937]">ZENTIVORA</span>
         </Link>
       </div>
 

@@ -12,13 +12,11 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import FeatureCard from '../components/FeatureCard';
-import TestimonialCard from '../components/TestimonialCard';
 import PricingCard from '../components/PricingCard';
-import Statistics from '../components/Statistics';
 import Workflow from '../components/Workflow';
-import ProductPreview from '../components/ProductPreview';
 import FAQ from '../components/FAQ';
 import Newsletter from '../components/Newsletter';
+import dashboardImg from '../assets/dashboard.png';
 
 export default function Home() {
   const [isYearly, setIsYearly] = useState(false);
@@ -59,33 +57,6 @@ export default function Home() {
       title: 'Accessible Anywhere',
       description:
         'Access your projects from any device, anywhere in the world, anytime.',
-    },
-  ];
-
-  const testimonials = [
-    {
-      quote:
-        "ZENTIVORA has transformed how we manage our scaffolding projects. The platform is intuitive and has saved us countless hours.",
-      author: 'James Mitchell',
-      role: 'Project Manager',
-      company: 'BuildRight Construction',
-      avatar: 'https://i.pravatar.cc/150?u=james',
-    },
-    {
-      quote:
-        'The safety compliance features alone make this worth it. We can track everything in one place and stay compliant with ease.',
-      author: 'Sarah Thompson',
-      role: 'Safety Officer',
-      company: 'Apex Scaffolding',
-      avatar: 'https://i.pravatar.cc/150?u=sarah',
-    },
-    {
-      quote:
-        'Amazing platform! Our team productivity has increased significantly since we started using ZENTIVORA.',
-      author: 'Michael Chen',
-      role: 'Operations Director',
-      company: 'Summit Projects',
-      avatar: 'https://i.pravatar.cc/150?u=michael',
     },
   ];
 
@@ -139,11 +110,8 @@ export default function Home() {
     <div className="min-h-screen bg-[#F6F3EE]">
       <Navbar />
 
-      <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Subtle radial gradients for premium depth */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-[#E5DED6] blur-[120px] rounded-full pointer-events-none -z-10" />
-
-        <div className="max-w-7xl mx-auto text-center relative z-10">
+      <section className="pt-32 pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1F2937] mb-6 tracking-tight">
             Scaffolding Management
             <br />
@@ -171,11 +139,30 @@ export default function Home() {
         </div>
       </section>
 
-      <Statistics />
+      <section className="bg-gray-50 py-16">
+        <div className="mx-auto max-w-6xl px-6 text-center">
+          <h2 className="mb-4 text-3xl font-bold text-[#1F2937]">
+            Powerful Dashboard for Project Management
+          </h2>
+          <p className="mx-auto mb-10 max-w-2xl text-gray-600">
+            Get a complete overview of your projects, team performance,
+            documents, and progress in one place. Our intuitive dashboard helps
+            you stay organized and make better decisions faster.
+          </p>
 
-      <Workflow />
+          <div className="flex justify-center">
+            <img
+              src={dashboardImg}
+              alt="Dashboard Preview"
+              className="w-full max-w-5xl rounded-xl shadow-lg transition duration-300 hover:scale-105"
+            />
+          </div>
+        </div>
+      </section>
 
-      <ProductPreview />
+      <div className="pb-8 sm:pb-12">
+        <Workflow />
+      </div>
 
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -191,25 +178,6 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <FeatureCard key={index} {...feature} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#EFE9E1]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-[#1F2937] mb-4">
-              Trusted by teams worldwide
-            </h2>
-            <p className="text-xl text-[#6B7280] max-w-2xl mx-auto">
-              See what our customers have to say about their experience with
-              ZENTIVORA.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard key={index} {...testimonial} />
             ))}
           </div>
         </div>

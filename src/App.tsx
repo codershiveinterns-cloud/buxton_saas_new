@@ -23,6 +23,11 @@ import ProjectWorkspace from './pages/ProjectWorkspace';
 import { Toaster } from 'react-hot-toast';
 import ScrollToTop from './components/ScrollToTop';
 import Meetings from './pages/Meetings';
+import Features from './pages/Features';
+import Pricing from './pages/Pricing';
+import Careers from './pages/Careers';
+import Blog from './pages/Blog';
+import HelpCenter from './pages/HelpCenter';
 
 function App() {
   return (
@@ -32,7 +37,13 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/help" element={<HelpCenter />} />
         <Route path="/policy" element={<Policy />} />
+        <Route path="/privacy" element={<Policy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

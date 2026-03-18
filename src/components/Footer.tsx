@@ -47,7 +47,7 @@ export default function Footer() {
             <ul className="space-y-4">
               <li>
                 <Link
-                  to="/"
+                  to="/features"
                   className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Features
@@ -55,7 +55,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/"
+                  to="/pricing"
                   className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Pricing
@@ -79,7 +79,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/contact"
+                  to="/careers"
                   className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Careers
@@ -95,7 +95,7 @@ export default function Footer() {
             <ul className="space-y-4">
               <li>
                 <Link
-                  to="/"
+                  to="/blog"
                   className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Blog
@@ -103,7 +103,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/contact"
+                  to="/help"
                   className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Help Center
@@ -127,7 +127,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/policy"
+                  to="/privacy"
                   className="text-base text-gray-500 hover:text-gray-800 transition-colors"
                 >
                   Privacy Policy

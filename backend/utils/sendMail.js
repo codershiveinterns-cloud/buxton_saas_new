@@ -5,8 +5,8 @@ let transporter;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const getMailCredentials = () => ({
-    user: process.env.EMAIL_USER || process.env.GMAIL_USER,
-    pass: process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
 });
 
 const normalizeRecipients = (to) => {
@@ -63,9 +63,8 @@ const sendMail = async ({ to, subject, html, text }) => {
     }
 
     try {
-        const credentials = getMailCredentials();
         const info = await getTransporter().sendMail({
-            from: process.env.MAIL_FROM || credentials.user,
+            from: `"Zentivora Technologies" <${process.env.EMAIL_USER}>`,
             to: recipients.join(','),
             subject,
             text,

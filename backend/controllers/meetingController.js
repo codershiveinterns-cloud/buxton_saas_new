@@ -162,3 +162,18 @@ exports.getMeetingsForUser = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+
+exports.deleteMeeting = async (req, res) => {
+    try {
+        const meeting = await Meeting.findByIdAndDelete(req.params.id);
+
+        if (!meeting) {
+            return res.status(404).json({ message: 'Meeting not found' });
+        }
+
+        res.json({ message: 'Meeting deleted successfully' });
+    } catch (error) {
+        console.error('Delete meeting error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

@@ -7,17 +7,19 @@ const connectDB = require('./config/database');
 const app = express();
 const http = require('http');
 const { Server } = require('socket.io');
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://buxton-saas-new.vercel.app'
+];
+const corsOptions = {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials: true
+};
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: [
-            "http://localhost:5173",
-            "https://buxton-saas-new.vercel.app"
-        ],
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-        credentials: true
-    }
+    cors: corsOptions
 });
 
 app.locals.io = io;
@@ -34,17 +36,9 @@ connectDB();
 const path = require('path');
 
 // Init Middleware
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Enable CORS
-app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "https://buxton-saas-new.vercel.app"
-    ],
-    credentials: true
-}));
 // Rate Limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -59,7 +53,7 @@ app.get('/', (req, res) => {
     res.send('ZENTIVORA Backend API Running');
 });
 app.get('/api/health', (req, res) => {
-    res.json({ status: "Backend connected successfully" });
+    res.json({ status: 'Backend connected successfully' });
 });
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/dashboard', require('./routes/statsRoutes'));
@@ -74,7 +68,7 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/notes', require('./routes/noteRoutes'));
 app.use('/api/meetings', require('./routes/meetingRoutes'));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 server.listen(PORT, () => {
     console.log('---');

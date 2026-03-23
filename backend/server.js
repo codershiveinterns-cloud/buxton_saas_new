@@ -12,9 +12,17 @@ const allowedOrigins = [
     'https://buxton-saas-new.vercel.app'
 ];
 const corsOptions = {
-    origin: allowedOrigins,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    credentials: true
+    origin(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS'));
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+    credentials: true,
+    optionsSuccessStatus: 204
 };
 
 const server = http.createServer(app);
@@ -37,6 +45,7 @@ const path = require('path');
 
 // Init Middleware
 app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Rate Limiting

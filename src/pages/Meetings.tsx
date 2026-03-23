@@ -82,6 +82,7 @@ export default function Meetings() {
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingMeetingId, setDeletingMeetingId] = useState<string | null>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDateKey, setSelectedDateKey] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -90,6 +91,7 @@ export default function Meetings() {
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
   const userEmail = user?.email || '';
+  const isManager = user?.role === 'manager';
 
   const getAuthConfig = () => ({
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -171,6 +173,26 @@ export default function Meetings() {
       toast.error(error.response?.data?.message || 'Failed to create meeting');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteMeeting = async (id: string) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this meeting?');
+    if (!confirmDelete) {
+      return;
+    }
+
+    setDeletingMeetingId(id);
+
+    try {
+      const response = await api.delete(`/meetings/${id}`, getAuthConfig());
+      setMeetings((prev) => prev.filter((meeting) => meeting._id !== id));
+      setSelectedMeeting((prev) => (prev?._id === id ? null : prev));
+      toast.success(response.data.message || 'Meeting deleted successfully');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to delete meeting');
+    } finally {
+      setDeletingMeetingId(null);
     }
   };
 
@@ -392,6 +414,16 @@ export default function Meetings() {
                   >
                     View Details
                   </button>
+                  {isManager && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteMeeting(meeting._id)}
+                      disabled={deletingMeetingId === meeting._id}
+                      className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600 disabled:opacity-50"
+                    >
+                      {deletingMeetingId === meeting._id ? 'Deleting...' : 'Delete'}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

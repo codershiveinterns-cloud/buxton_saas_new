@@ -20,13 +20,19 @@ export default function Footer() {
             </p>
             <div className="flex space-x-5">
               <a
-                href="#"
+                href="https://www.instagram.com/ravi_rana1100/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit Instagram profile"
                 className="text-gray-400 hover:text-gray-800 transition-colors"
               >
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/in/ravi-rana-88bb693b6/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit LinkedIn profile"
                 className="text-gray-400 hover:text-gray-800 transition-colors"
               >
                 <Linkedin className="w-5 h-5" />

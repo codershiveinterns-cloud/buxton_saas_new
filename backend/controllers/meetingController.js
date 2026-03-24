@@ -6,13 +6,13 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const sortMeetings = (query) => query.sort({ date: 1, time: 1, createdAt: -1 });
 
-const parseTeamMembers = (teamMembers) => {
-    if (Array.isArray(teamMembers)) {
-        return teamMembers;
+const parseParticipants = (participants) => {
+    if (Array.isArray(participants)) {
+        return participants;
     }
 
-    if (typeof teamMembers === 'string') {
-        return teamMembers.split(',');
+    if (typeof participants === 'string') {
+        return participants.split(',');
     }
 
     return [];
@@ -56,21 +56,21 @@ const buildMeetingEmail = (meeting) => {
 
 exports.createMeeting = async (req, res) => {
     try {
-        const { title, description, date, time, meetingLink, teamMembers } = req.body;
+        const { title, description, date, time, meetingLink, teamMembers, participants } = req.body;
 
         if (!title || !date || !time || !meetingLink) {
             return res.status(400).json({ success: false, message: 'Title, date, time, and meeting link are required' });
         }
 
         const creatorEmail = normalizeEmail(req.user.email);
-        const recipientList = parseTeamMembers(teamMembers);
-        const normalizedTeamMembers = [...new Set(recipientList.map(normalizeEmail).filter(Boolean))];
-        const invalidEmails = normalizedTeamMembers.filter((email) => !EMAIL_REGEX.test(email));
+        const participantList = parseParticipants(participants ?? teamMembers);
+        const normalizedParticipants = [...new Set(participantList.map(normalizeEmail).filter(Boolean))];
+        const invalidEmails = normalizedParticipants.filter((email) => !EMAIL_REGEX.test(email));
 
         if (invalidEmails.length > 0) {
             return res.status(400).json({
                 success: false,
-                message: `Invalid team member email(s): ${invalidEmails.join(', ')}`
+                message: `Invalid participant email(s): ${invalidEmails.join(', ')}`
             });
         }
 
@@ -80,27 +80,34 @@ exports.createMeeting = async (req, res) => {
             date,
             time: time.trim(),
             meetingLink: meetingLink.trim(),
-            teamMembers: normalizedTeamMembers,
+            teamMembers: normalizedParticipants,
             createdBy: creatorEmail
         });
 
-        const mailRecipients = [...new Set([...normalizedTeamMembers, creatorEmail])];
         const emailContent = buildMeetingEmail(meeting);
 
         let mailResult = { sent: false, skipped: false, reason: '' };
-        try {
-            mailResult = await sendMail({
-                to: mailRecipients,
-                subject: emailContent.subject,
-                text: emailContent.text,
-                html: emailContent.html
-            });
-        } catch (mailError) {
-            console.error('Meeting email error:', mailError);
+        if (normalizedParticipants.length > 0) {
+            try {
+                mailResult = await sendMail({
+                    to: normalizedParticipants,
+                    subject: emailContent.subject,
+                    text: emailContent.text,
+                    html: emailContent.html
+                });
+            } catch (mailError) {
+                console.error('Meeting email error:', mailError);
+                mailResult = {
+                    sent: false,
+                    skipped: false,
+                    reason: mailError.message || 'Failed to send emails'
+                };
+            }
+        } else {
             mailResult = {
                 sent: false,
-                skipped: false,
-                reason: mailError.message || 'Failed to send emails'
+                skipped: true,
+                reason: 'No participants supplied for email delivery'
             };
         }
 

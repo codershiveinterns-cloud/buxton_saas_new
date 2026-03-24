@@ -1,13 +1,12 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-let transporter;
+let resendClient;
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DEFAULT_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'no-reply@zentivoratech.com';
+const DEFAULT_FROM = `Zentivora Technologies <${DEFAULT_FROM_EMAIL}>`;
 
-const getMailCredentials = () => ({
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-});
+const getApiKey = () => process.env.RESEND_API_KEY;
 
 const normalizeRecipients = (to) => {
     const rawRecipients = Array.isArray(to)
@@ -26,32 +25,22 @@ const normalizeRecipients = (to) => {
     return recipients;
 };
 
-const isMailConfigured = () => {
-    const credentials = getMailCredentials();
-    return Boolean(credentials.user && credentials.pass);
-};
+const isMailConfigured = () => Boolean(getApiKey());
 
-const getTransporter = () => {
-    if (!transporter) {
-        const credentials = getMailCredentials();
-
-        if (!credentials.user || !credentials.pass) {
-            throw new Error('EMAIL_USER and EMAIL_PASS must be configured for Gmail SMTP');
+const getResendClient = () => {
+    if (!resendClient) {
+        const apiKey = getApiKey();
+        if (!apiKey) {
+            throw new Error('RESEND_API_KEY must be configured for Resend email delivery');
         }
 
-        transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: credentials.user,
-                pass: credentials.pass
-            }
-        });
+        resendClient = new Resend(apiKey);
     }
 
-    return transporter;
+    return resendClient;
 };
 
-const sendMail = async ({ to, subject, html, text }) => {
+const sendMail = async ({ to, subject, html, text, from = DEFAULT_FROM }) => {
     const recipients = normalizeRecipients(to);
 
     if (recipients.length === 0) {
@@ -59,26 +48,38 @@ const sendMail = async ({ to, subject, html, text }) => {
     }
 
     if (!isMailConfigured()) {
-        throw new Error('EMAIL_USER and EMAIL_PASS are not configured');
+        throw new Error('RESEND_API_KEY is not configured');
     }
 
     try {
-        const info = await getTransporter().sendMail({
-            from: `"Zentivora Technologies" <${process.env.EMAIL_USER}>`,
-            to: recipients.join(','),
+        console.log('[Mail] Sending email with Resend:', {
+            from,
+            to: recipients,
+            subject
+        });
+        const { data, error } = await getResendClient().emails.send({
+            from,
+            to: recipients,
             subject,
             text,
             html
         });
 
-        return { sent: true, messageId: info.messageId };
+        if (error) {
+            throw new Error(error.message || 'Resend failed to send email');
+        }
+
+        console.log('[Mail] Email sent successfully with Resend:', data?.id);
+        return { sent: true, messageId: data?.id };
     } catch (error) {
-        console.error('[Mail] Failed to send email:', error);
+        console.error('[Mail] Failed to send email:', error?.message || error);
         throw error;
     }
 };
 
 module.exports = {
+    DEFAULT_FROM,
+    DEFAULT_FROM_EMAIL,
     sendMail,
     isMailConfigured
 };

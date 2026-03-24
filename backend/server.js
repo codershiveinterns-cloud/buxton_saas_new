@@ -9,7 +9,9 @@ const http = require('http');
 const { Server } = require('socket.io');
 const allowedOrigins = [
     'http://localhost:5173',
-    'https://buxton-saas-new.vercel.app'
+    'https://buxton-saas-new.vercel.app',
+    'https://zentivoratech.com',
+    'https://www.zentivoratech.com'
 ];
 const corsOptions = {
     origin(origin, callback) {
@@ -76,6 +78,7 @@ app.use('/api/activities', require('./routes/activityRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/notes', require('./routes/noteRoutes'));
 app.use('/api/meetings', require('./routes/meetingRoutes'));
+app.use('/api', require('./routes/mailRoutes'));
 
 const PORT = process.env.PORT || 5001;
 

@@ -4,34 +4,49 @@ const TeamMember = require('../models/TeamMember');
 const { addUserToTeam } = require('./teamService');
 
 const INVITE_DURATION_MS = 1000 * 60 * 60 * 24 * 7;
-const DEFAULT_APP_URL = 'https://www.zentivoratech.com/login';
+const DEFAULT_APP_URL = 'https://www.zentivoratech.com';
 
 const normalizeEmail = (email = '') => email.trim().toLowerCase();
 
-const buildInviteUrl = (token) => {
-    const appUrl = process.env.INVITE_LOGIN_URL || process.env.FRONTEND_URL || process.env.APP_URL || DEFAULT_APP_URL;
-    const normalizedUrl = appUrl.replace(/\/$/, '');
-    const separator = normalizedUrl.includes('?') ? '&' : '?';
-    return `${normalizedUrl}${separator}inviteToken=${token}`;
+const getInviteBaseUrl = () => {
+    const appUrl = process.env.INVITE_APP_URL || process.env.FRONTEND_URL || process.env.APP_URL || DEFAULT_APP_URL;
+    return appUrl.replace(/\/$/, '');
 };
 
-const buildInviteEmail = ({ managerName, teamName, inviteUrl }) => ({
+const appendInviteToken = (url, token) => {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}inviteToken=${token}`;
+};
+
+const buildInviteUrl = (token, mode = 'login') => {
+    const appUrl = getInviteBaseUrl();
+    const normalizedUrl = appUrl.replace(/\/$/, '');
+    const inviteMode = mode === 'signup' ? 'signup' : 'login';
+    return `${appendInviteToken(normalizedUrl, token)}&inviteAction=${inviteMode}`;
+};
+
+const buildInviteEmail = ({ managerName, teamName, loginUrl, signupUrl }) => ({
     subject: "You're invited to join a team",
     text: [
         `You have been invited by ${managerName} to join ${teamName}.`,
-        `Accept your invite: ${inviteUrl}`
+        `Log in to accept your invite: ${loginUrl}`,
+        `Create an account to join the team: ${signupUrl}`
     ].join('\n'),
     html: `
         <div style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.6;">
             <h2 style="margin-bottom: 12px;">You're invited to join a team</h2>
             <p>${managerName} invited you to join <strong>${teamName}</strong> on Zentivora.</p>
             <p style="margin: 24px 0;">
-                <a href="${inviteUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:12px 18px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;">
-                    Accept Invitation
+                <a href="${loginUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:12px 18px;background:#2563eb;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;margin-right:12px;">
+                    Log In
+                </a>
+                <a href="${signupUrl}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:12px 18px;background:#1f2937;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:600;">
+                    Sign Up
                 </a>
             </p>
-            <p>If the button does not work, open this link:</p>
-            <p><a href="${inviteUrl}" target="_blank" rel="noopener noreferrer">${inviteUrl}</a></p>
+            <p>If the buttons do not work, open one of these links:</p>
+            <p><strong>Login:</strong> <a href="${loginUrl}" target="_blank" rel="noopener noreferrer">${loginUrl}</a></p>
+            <p><strong>Signup:</strong> <a href="${signupUrl}" target="_blank" rel="noopener noreferrer">${signupUrl}</a></p>
         </div>
     `
 });

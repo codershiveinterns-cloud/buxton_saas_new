@@ -115,11 +115,13 @@ exports.createUser = async (req, res) => {
             teamId: req.user.teamId || req.user.workspaceId
         });
 
-        const inviteUrl = buildInviteUrl(invite.token);
+        const inviteUrl = buildInviteUrl(invite.token, 'login');
+        const signupUrl = buildInviteUrl(invite.token, 'signup');
         const inviteEmail = buildInviteEmail({
             managerName: req.user.name || 'Your manager',
             teamName: `${req.user.name || 'Manager'}'s Team`,
-            inviteUrl
+            loginUrl: inviteUrl,
+            signupUrl
         });
 
         await sendMail({
@@ -142,7 +144,8 @@ exports.createUser = async (req, res) => {
             success: true, 
             message: 'Team member invited successfully', 
             user: teamMember,
-            inviteUrl
+            inviteUrl,
+            signupUrl
         });
     } catch (err) {
         console.error(err.message);

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowRight,
   Shield,
@@ -19,7 +19,19 @@ import Newsletter from '../components/Newsletter';
 import dashboardImg from '../assets/dashboard.png';
 
 export default function Home() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isYearly, setIsYearly] = useState(false);
+
+  const inviteToken = searchParams.get('inviteToken');
+  const inviteAction = searchParams.get('inviteAction');
+
+  useEffect(() => {
+    if (inviteToken) {
+      const destination = inviteAction === 'signup' ? '/signup' : '/login';
+      navigate(`${destination}?inviteToken=${encodeURIComponent(inviteToken)}`, { replace: true });
+    }
+  }, [inviteAction, inviteToken, navigate]);
 
   const features = [
     {

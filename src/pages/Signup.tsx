@@ -1,13 +1,19 @@
 import { useState, FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Hammer, Loader2 } from 'lucide-react';
 
 import toast from 'react-hot-toast';
-import { authService } from '../services/authService';
+import { authService, inviteStorage } from '../services/authService';
 import PasswordInput from '../components/PasswordInput';
+import { getPendingPlanSelection } from '../services/planService';
+import { getPlanLabel } from '../utils/planUtils';
+import { clearPendingInviteToken } from '../services/inviteService';
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const pendingPlan = getPendingPlanSelection();
+  const inviteToken = searchParams.get('inviteToken') || inviteStorage.get();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -77,11 +83,16 @@ export default function Signup() {
       setErrors((prev) => ({ ...prev, general: '' }));
 
       try {
-        await authService.registerUser(formData.email, formData.password, formData.name);
-        toast.success('Signup successful! Please verify your email.');
+        await authService.registerUser(formData.email, formData.password, formData.name, inviteToken || undefined);
+        if (inviteToken) {
+          clearPendingInviteToken();
+          toast.success('Account created and invitation linked successfully. Please verify your email and sign in.');
+        } else {
+          toast.success('Signup successful! Please verify your email.');
+        }
         
         // Navigate back to login, asking them to verify their email
-        navigate('/login');
+        navigate(inviteToken ? '/login' : '/login');
       } catch (err: any) {
         let errorMessage = err.response?.data?.message || err.message || 'Signup failed';
         if (err.code === 'auth/email-already-in-use') {
@@ -129,6 +140,16 @@ export default function Signup() {
         </div>
 
         <div className="bg-white rounded-xl border border-[#E5DED6] p-8">
+          {(pendingPlan || inviteToken) && (
+            <div className="mb-6 rounded-lg border border-[#D7C7B3] bg-[#FFF7ED] p-4 text-sm text-[#6B7280]">
+              {inviteToken ? (
+                <>This signup is linked to a team invitation. Your account will join that team automatically.</>
+              ) : (
+                <>You selected the <span className="font-semibold text-[#1F2937]">{getPlanLabel(pendingPlan!.planName)}</span> plan. We&apos;ll apply it to your account after you sign in.</>
+              )}
+            </div>
+          )}
+
           {errors.general && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 font-medium">
               {errors.general}

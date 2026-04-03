@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 const Document = require('../models/Document');
 const Project = require('../models/Project');
+const { validateStorageLimit } = require('../services/planValidationService');
 
 exports.createDocument = async (req, res) => {
     try {
@@ -37,11 +40,15 @@ exports.createDocument = async (req, res) => {
         const finalFileUrl = req.file ? `/uploads/${req.file.filename}` : req.body.fileUrl;
         const fileName = req.file ? req.file.originalname : 'External File';
         const fileType = req.file ? req.file.mimetype : 'unknown';
+        const fileSizeBytes = req.file ? req.file.size : 0;
+
+        await validateStorageLimit(req.user.id, fileSizeBytes);
 
         const newDoc = new Document({
             title: title || fileName,
             fileName,
             fileType,
+            fileSizeBytes,
             fileUrl: finalFileUrl,
             projectId: projectId || undefined,
             uploadedBy: req.user.id,
@@ -74,7 +81,13 @@ exports.createDocument = async (req, res) => {
         });
     } catch (err) {
         console.error('Document Upload Error:', err);
-        res.status(500).json({
+        if (req.file?.filename) {
+            const uploadedFilePath = path.join(__dirname, '../uploads', req.file.filename);
+            if (fs.existsSync(uploadedFilePath)) {
+                fs.unlinkSync(uploadedFilePath);
+            }
+        }
+        res.status(err.statusCode || 500).json({
             success: false,
             message: err.message || 'Document upload failed'
         });

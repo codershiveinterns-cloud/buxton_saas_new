@@ -13,6 +13,10 @@ const TeamMemberSchema = new mongoose.Schema({
         type: String,
         default: 'member'
     },
+    phone: {
+        type: String,
+        trim: true
+    },
     managerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -25,7 +29,7 @@ const TeamMemberSchema = new mongoose.Schema({
     },
     teamId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Team' // Assuming there is or will be a Team logic, otherwise just generic
+        ref: 'Workspace'
     },
     status: {
         type: String,

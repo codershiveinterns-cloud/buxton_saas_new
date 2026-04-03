@@ -1,12 +1,17 @@
 import { useState, FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Hammer, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 import toast from 'react-hot-toast';
-import { authService } from '../services/authService';
+import { authService, inviteStorage } from '../services/authService';
+import { getUserPlan, syncPendingPlanSelection } from '../services/planService';
+import { clearPendingInviteToken } from '../services/inviteService';
+import { isManagerRole } from '../utils/roleUtils';
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const inviteToken = searchParams.get('inviteToken') || inviteStorage.get();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -47,9 +52,17 @@ export default function Login() {
       setErrors((prev) => ({ ...prev, general: '' }));
 
       try {
-        await authService.loginUser(formData.email, formData.password);
+        const loginResponse = await authService.loginUser(formData.email, formData.password);
+        if (inviteToken) {
+          inviteStorage.save(inviteToken);
+          await authService.acceptInvite(inviteToken, loginResponse.token);
+          clearPendingInviteToken();
+        }
+        const pendingPlanSnapshot = await syncPendingPlanSelection(loginResponse.user.id);
+        const currentPlanSnapshot =
+          pendingPlanSnapshot || (await getUserPlan(loginResponse.user.id).catch(() => null));
         toast.success('Logged in successfully!');
-        navigate('/dashboard');
+        navigate(currentPlanSnapshot?.plan || !isManagerRole(loginResponse.user.role) ? '/dashboard' : '/pricing');
       } catch (err: any) {
         let errorMessage = err.response?.data?.message || err.message || 'Login failed';
         
@@ -196,7 +209,7 @@ export default function Login() {
             <p className="text-sm text-[#6B7280]">
               Don't have an account?{' '}
               <Link
-                to="/signup"
+                to={inviteToken ? `/signup?inviteToken=${encodeURIComponent(inviteToken)}` : '/signup'}
                 className="font-medium text-[#1F2937] hover:text-[#2563EB] transition-colors"
               >
                 Sign up

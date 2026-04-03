@@ -1,10 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Download, FileText, Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import AppShell from '../components/AppShell';
+import UpgradePrompt from '../components/UpgradePrompt';
+import { usePlan } from '../context/PlanContext';
 import api from '../lib/api';
+import { formatStorage, isLimitReached, willExceedLimit } from '../utils/planUtils';
+import { isManagerRole } from '../utils/roleUtils';
 
 export default function Documents() {
+  const { planSnapshot, refreshPlan } = usePlan();
+  const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') as string) : null;
+  const isManager = isManagerRole(user?.role);
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,6 +21,10 @@ export default function Documents() {
   const [newStatus, setNewStatus] = useState('Draft');
   const [isUploading, setIsUploading] = useState(false);
   const fileBaseUrl = (api.defaults.baseURL || '').replace(/\/api\/?$/, '');
+
+  const storageUsedBytes = planSnapshot?.usage.storageUsedBytes ?? 0;
+  const storageLimitBytes = planSnapshot?.limits?.storageBytes ?? null;
+  const storageLimitReached = isLimitReached(storageUsedBytes, storageLimitBytes);
 
   const fetchDocuments = async () => {
     try {
@@ -36,6 +48,11 @@ export default function Documents() {
     e.preventDefault();
     if (!selectedFile) {
       toast.error('Please select a file to upload');
+      return;
+    }
+
+    if (willExceedLimit(storageUsedBytes, storageLimitBytes, selectedFile.size)) {
+      toast.error('Upgrade your plan to continue');
       return;
     }
 
@@ -65,8 +82,10 @@ export default function Documents() {
       setSelectedFile(null);
       setNewStatus('Draft');
       await fetchDocuments();
+      await refreshPlan();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to create document');
+      await refreshPlan();
     } finally {
       setIsUploading(false);
     }
@@ -86,8 +105,9 @@ export default function Documents() {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       await api.delete(`/documents/${id}`, config);
       toast.success('Document deleted');
-      fetchDocuments();
-    } catch (err: any) {
+      await fetchDocuments();
+      await refreshPlan();
+    } catch {
       toast.error('Failed to delete document');
     }
   };
@@ -97,15 +117,37 @@ export default function Documents() {
       <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="mb-2 text-2xl font-bold text-[#1F2937] sm:text-3xl">Documents</h1>
-          <p className="text-sm text-[#6B7280] sm:text-base">Manage all your project files, reports, and certifications.</p>
+          <p className="text-sm text-[#6B7280] sm:text-base">
+            Manage all your project files, reports, and certifications. Storage usage: {formatStorage(storageUsedBytes)} / {formatStorage(storageLimitBytes)}.
+          </p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2 text-white shadow-sm transition-colors hover:bg-[#1D4ED8] sm:w-auto"
-        >
-          <Plus className="w-5 h-5" /> Upload Document
-        </button>
+        {storageLimitReached && isManager ? (
+          <Link
+            to="/pricing"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1F2937] px-4 py-2 text-white shadow-sm transition-colors hover:bg-[#111827] sm:w-auto"
+          >
+            Upgrade Plan
+          </Link>
+        ) : (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            disabled={storageLimitReached}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2 text-white shadow-sm transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          >
+            <Plus className="h-5 w-5" /> Upload Document
+          </button>
+        )}
       </div>
+
+      {storageLimitReached && (
+        <div className="mb-6">
+          <UpgradePrompt
+            compact
+            message={isManager ? 'You have reached your storage limit. Upgrade to upload more documents.' : 'Your manager needs to upgrade the team plan to allow more storage.'}
+            showButton={isManager}
+          />
+        </div>
+      )}
 
       <div className="overflow-hidden rounded-xl border border-[#E5DED6] bg-white shadow-sm">
         {loading ? (
@@ -242,6 +284,11 @@ export default function Documents() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
             <h2 className="mb-4 text-xl font-bold text-[#1F2937]">Upload Document</h2>
+            {storageLimitReached && (
+              <div className="mb-4 rounded-lg border border-[#D7C7B3] bg-[#FFF7ED] p-3 text-sm text-[#6B7280]">
+                Upgrade your plan to continue.
+              </div>
+            )}
             <form onSubmit={handleCreateDocument} className="space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-[#1F2937]">Document Title</label>
@@ -285,7 +332,7 @@ export default function Documents() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isUploading}
+                  disabled={isUploading || storageLimitReached}
                   className="rounded-lg bg-[#2563EB] px-4 py-2 text-white transition-colors hover:bg-[#1D4ED8] disabled:opacity-50"
                 >
                   {isUploading ? 'Uploading...' : 'Upload'}

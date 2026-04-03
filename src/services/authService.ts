@@ -8,8 +8,22 @@ import {
 import { auth } from '../firebase';
 import api from '../lib/api';
 
+const PENDING_INVITE_KEY = 'pendingInviteToken';
+
+export const inviteStorage = {
+  save(token: string) {
+    localStorage.setItem(PENDING_INVITE_KEY, token);
+  },
+  get() {
+    return localStorage.getItem(PENDING_INVITE_KEY);
+  },
+  clear() {
+    localStorage.removeItem(PENDING_INVITE_KEY);
+  }
+};
+
 export const authService = {
-  async registerUser(email: string, password: string, name: string) {
+  async registerUser(email: string, password: string, name: string, inviteToken?: string) {
     // 1. Firebase Auth Registration
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -22,7 +36,8 @@ export const authService = {
       name,
       email,
       firebaseUid: userCredential.user.uid,
-      password
+      password,
+      inviteToken
     });
 
     return { userCredential, response };
@@ -53,17 +68,32 @@ export const authService = {
     return response.data;
   },
 
+  async acceptInvite(token: string, authToken: string) {
+    const response = await api.post('/invites/accept', {
+      token
+    }, {
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }
+    });
+
+    if (response.data?.user) {
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    inviteStorage.clear();
+    return response.data;
+  },
+
   async resetPassword(email: string) {
     return await sendPasswordResetEmail(auth, email);
   },
 
-  async inviteTeamMember(email: string, name: string, role: string, phone: string, managerToken: string) {
+  async inviteTeamMember(email: string, name: string, phone: string, managerToken: string) {
     try {
       // Create team member strictly in our backend - Firebase account is dynamically generated upon Signup link acceptance
       const response = await api.post('/team/add-member', {
         name,
         email,
-        role,
         phone
       }, {
         headers: { Authorization: `Bearer ${managerToken}` }
@@ -79,5 +109,8 @@ export const authService = {
     await signOut(auth);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('planSnapshot');
+    localStorage.removeItem('pendingPlanSelection');
+    inviteStorage.clear();
   }
 };

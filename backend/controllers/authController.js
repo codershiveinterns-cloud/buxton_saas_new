@@ -1,20 +1,11 @@
 const User = require('../models/User');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const TeamMember = require('../models/TeamMember');
 const { createWorkspaceForUser, ensureWorkspaceForUser } = require('../utils/workspace');
-
-
-// Helper for strong password validation
-const isStrongPassword = (password) => {
-    // Minimum 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return passwordRegex.test(password);
-};
+const { getValidInviteByToken, acceptInviteForUser } = require('../services/inviteService');
 
 exports.signup = async (req, res) => {
-    const { name, email, firebaseUid } = req.body;
+    const { name, email, firebaseUid, inviteToken } = req.body;
 
     // Validate request
     if (!name || !email || !firebaseUid) {
@@ -22,77 +13,68 @@ exports.signup = async (req, res) => {
     }
 
     try {
+        let invite = null;
+        if (inviteToken) {
+            invite = await getValidInviteByToken(inviteToken);
+            if (invite.email !== email.trim().toLowerCase()) {
+                return res.status(400).json({ message: 'Invitation email does not match this signup email' });
+            }
+        }
+
         let user = await User.findOne({ email });
         if (user) {
             if (user.status === 'invited') {
                 user.status = 'active';
                 user.firebaseUid = firebaseUid;
                 user.name = name;
+                if (invite) {
+                    user.role = 'member';
+                    user.managerId = invite.managerId._id;
+                    user.workspaceId = invite.teamId._id;
+                    user.teamId = invite.teamId._id;
+                }
                 await user.save();
-                await ensureWorkspaceForUser(user);
-                
-                await TeamMember.updateMany(
-                    { email: user.email, status: 'invited' },
-                    { $set: { status: 'active', name: user.name } }
-                );
+
+                if (invite) {
+                    await acceptInviteForUser({ token: inviteToken, user });
+                } else {
+                    await ensureWorkspaceForUser(user);
+                    await TeamMember.updateMany(
+                        { email: user.email, status: 'invited' },
+                        { $set: { status: 'active', name: user.name } }
+                    );
+                }
 
                 return res.status(201).json({ message: 'Invitation accepted and User registered successfully' });
             }
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Brand new user (Manager or individual user)
+        // Brand new user
         user = new User({
             name,
             email,
             firebaseUid,
-            role: 'manager',
+            role: invite ? 'member' : 'manager',
+            managerId: invite?.managerId?._id,
+            workspaceId: invite?.teamId?._id,
+            teamId: invite?.teamId?._id,
             status: 'active'
         });
 
         await user.save();
-        await createWorkspaceForUser(user);
+
+        if (invite) {
+            await acceptInviteForUser({ token: inviteToken, user });
+        } else {
+            await createWorkspaceForUser(user);
+        }
 
         res.status(201).json({ message: 'User registered successfully via Firebase' });
 
     } catch (err) {
         console.error(err.message);
-        res.status(500).json({ message: 'Server error' });
-    }
-};
-
-exports.acceptInvite = async (req, res) => {
-    const { inviteToken, firebaseUid, name } = req.body;
-
-    if (!inviteToken || !firebaseUid) {
-        return res.status(400).json({ message: 'Missing invite token or authentication parameters' });
-    }
-
-    try {
-        const user = await User.findOne({ inviteToken, status: 'invited' });
-        
-        if (!user) {
-            return res.status(400).json({ message: 'Invalid or expired invitation token' });
-        }
-
-        // Activate the User document
-        user.status = 'active';
-        user.inviteToken = undefined;
-        user.firebaseUid = firebaseUid;
-        if (name) user.name = name; // Update name to what they signed up with
-        await user.save();
-        await ensureWorkspaceForUser(user);
-
-        // Also activate their specific TeamMember relationship
-        await TeamMember.updateMany(
-            { email: user.email, status: 'invited' },
-            { $set: { status: 'active', name: user.name } }
-        );
-
-        res.status(200).json({ message: 'Invitation accepted and account activated successfully' });
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ message: 'Server error' });
+        res.status(err.statusCode || 500).json({ message: err.message || 'Server error' });
     }
 };
 
@@ -161,6 +143,7 @@ exports.login = async (req, res) => {
                         email: user.email,
                         role: user.role,
                         managerId: user.managerId,
+                        teamId: user.teamId || user.workspaceId,
                         workspaceId: user.workspaceId,
                         firebaseUid: user.firebaseUid
                     }

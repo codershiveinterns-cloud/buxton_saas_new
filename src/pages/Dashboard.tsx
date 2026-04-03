@@ -9,12 +9,18 @@ import {
   Clock,
   Plus,
   MoreVertical,
-  FolderOpen
+  FolderOpen,
+  Lock
 } from 'lucide-react';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
+import UpgradePrompt from '../components/UpgradePrompt';
+import { usePlan } from '../context/PlanContext';
+import { formatStorage, hasFeatureAccess } from '../utils/planUtils';
+import { isManagerRole, isMemberRole } from '../utils/roleUtils';
 
 export default function Dashboard() {
+  const { planSnapshot } = usePlan();
   const [stats, setStats] = useState([
     { label: 'Active Projects', value: '0', icon: FileText, trend: '' },
     { label: 'Tasks Completed', value: '0', icon: CheckSquare, trend: '' },
@@ -101,6 +107,9 @@ export default function Dashboard() {
   const [taskProjectId, setTaskProjectId] = useState('');
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
+  const hasPrivateNotes = hasFeatureAccess(planSnapshot, 'privateNotes');
+  const hasAdvancedFeatures = hasFeatureAccess(planSnapshot, 'advanced');
+  const isManager = isManagerRole(user?.role);
 
   // Document Modal State
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
@@ -160,7 +169,7 @@ export default function Dashboard() {
       setTaskProjectId('');
       
       // Fast refresh projects
-      if (user?.role !== 'member') {
+      if (!isMemberRole(user?.role)) {
         const projectsRes = await api.get('/projects', config);
         const activeProjList = projectsRes.data.projects.filter((p: any) => p.status !== 'Completed');
         setActiveProjects(activeProjList.slice(0, 5));
@@ -240,6 +249,55 @@ export default function Dashboard() {
                 Here's what's happening with your projects today.
               </p>
             </div>
+
+            {planSnapshot?.plan && (
+              <div className="rounded-2xl border border-[#E5DED6] bg-white p-5 shadow-sm">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#2563EB]">Active Plan</p>
+                    <h2 className="mt-2 text-2xl font-bold text-[#1F2937]">{planSnapshot.plan.label}</h2>
+                    <p className="mt-2 text-sm text-[#6B7280]">
+                      Team usage: {planSnapshot.usage.teamMembersUsed} / {planSnapshot.limits?.teamMembers ?? 'Unlimited'} members
+                    </p>
+                    <p className="mt-1 text-sm text-[#6B7280]">
+                      Storage usage: {formatStorage(planSnapshot.usage.storageUsedBytes)} / {formatStorage(planSnapshot.limits?.storageBytes ?? null)}
+                    </p>
+                  </div>
+
+                  {isManager ? (
+                    <Link
+                      to="/pricing"
+                      className="inline-flex items-center justify-center rounded-lg border border-[#D7C7B3] bg-[#FFF7ED] px-4 py-2 text-sm font-medium text-[#1F2937]"
+                    >
+                      Upgrade Plan
+                    </Link>
+                  ) : null}
+                </div>
+
+                {!hasAdvancedFeatures && isManager && (
+                  <div className="mt-5 grid gap-3 md:grid-cols-2">
+                    <div className="rounded-xl border border-dashed border-[#E5DED6] bg-[#F9F7F3] p-4">
+                      <div className="flex items-center gap-3">
+                        <Lock className="h-5 w-5 text-[#C0841A]" />
+                        <div>
+                          <p className="font-medium text-[#1F2937]">Meetings are locked</p>
+                          <p className="text-sm text-[#6B7280]">Upgrade to Professional or Premium Plus to schedule meetings.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-dashed border-[#E5DED6] bg-[#F9F7F3] p-4">
+                      <div className="flex items-center gap-3">
+                        <Lock className="h-5 w-5 text-[#C0841A]" />
+                        <div>
+                          <p className="font-medium text-[#1F2937]">Private notes are locked</p>
+                          <p className="text-sm text-[#6B7280]">Upgrade to keep personal notes inside the workspace.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Statistics Cards */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
@@ -398,7 +456,15 @@ export default function Dashboard() {
             
             {/* Notepad Widget */}
             <div className="h-[400px]">
-              {user?.role !== 'member' && user?.role !== 'Worker' && <Notepad />}
+              {!isMemberRole(user?.role) && hasPrivateNotes ? (
+                <Notepad />
+              ) : !isMemberRole(user?.role) ? (
+                <UpgradePrompt
+                  compact
+                  title="Private notes are not available on your plan"
+                  message="Upgrade to Professional or Premium Plus to unlock private note-taking."
+                />
+              ) : null}
             </div>
           </div>
         </div>

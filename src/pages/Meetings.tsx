@@ -25,7 +25,11 @@ import {
 } from 'date-fns';
 import toast from 'react-hot-toast';
 import AppShell from '../components/AppShell';
+import UpgradePrompt from '../components/UpgradePrompt';
+import { usePlan } from '../context/PlanContext';
 import api from '../lib/api';
+import { hasFeatureAccess } from '../utils/planUtils';
+import { isManagerRole } from '../utils/roleUtils';
 
 type WorkspaceUser = {
   _id: string;
@@ -77,6 +81,7 @@ const sortMeetings = (items: Meeting[]) =>
 const getDateKey = (date: string) => format(parseISO(date), 'yyyy-MM-dd');
 
 export default function Meetings() {
+  const { planSnapshot } = usePlan();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [workspaceUsers, setWorkspaceUsers] = useState<WorkspaceUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +96,8 @@ export default function Meetings() {
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
   const userEmail = user?.email || '';
-  const isManager = user?.role === 'manager';
+  const isManager = isManagerRole(user?.role);
+  const canUseMeetings = hasFeatureAccess(planSnapshot, 'meetings');
 
   const getAuthConfig = () => ({
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -124,9 +130,14 @@ export default function Meetings() {
   };
 
   useEffect(() => {
+    if (!canUseMeetings) {
+      setLoading(false);
+      return;
+    }
+
     loadMeetings();
     loadWorkspaceUsers();
-  }, [userEmail]);
+  }, [userEmail, canUseMeetings]);
 
   const handleToggleTeamMember = (email: string) => {
     setFormData((prev) => ({
@@ -212,6 +223,23 @@ export default function Meetings() {
     end: endOfWeek(monthEnd, { weekStartsOn: 0 }),
   });
   const selectedDateMeetings = meetingsByDate[selectedDateKey] || [];
+
+  if (!canUseMeetings) {
+    return (
+      <AppShell>
+        <div className="mb-8">
+          <h1 className="mb-2 text-2xl font-bold text-[#1F2937] sm:text-3xl">Meetings</h1>
+          <p className="text-sm text-[#6B7280] sm:text-base">
+            Schedule, share, and join team meetings without leaving the workspace.
+          </p>
+        </div>
+        <UpgradePrompt
+          message={isManager ? 'Meetings are available on Professional and Premium Plus plans.' : 'Your manager needs to upgrade the team plan to unlock meetings.'}
+          showButton={isManager}
+        />
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>

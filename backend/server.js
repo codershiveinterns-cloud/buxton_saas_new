@@ -78,6 +78,8 @@ app.use('/api/activities', require('./routes/activityRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/notes', require('./routes/noteRoutes'));
 app.use('/api/meetings', require('./routes/meetingRoutes'));
+app.use('/api/plans', require('./routes/planRoutes'));
+app.use('/api/invites', require('./routes/inviteRoutes'));
 app.use('/api', require('./routes/mailRoutes'));
 
 const PORT = process.env.PORT || 5001;

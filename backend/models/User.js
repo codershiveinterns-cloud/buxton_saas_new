@@ -37,6 +37,11 @@ const UserSchema = new mongoose.Schema({
         ref: 'Workspace',
         required: false
     },
+    teamId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Workspace',
+        required: false
+    },
     phone: {
         type: String,
         trim: true
@@ -53,10 +58,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['invited', 'active'],
         default: 'active'
-    },
-    inviteToken: {
-        type: String,
-        required: false
     },
     createdAt: {
         type: Date,

@@ -13,10 +13,12 @@ const buildWorkspaceName = (name) => `${name}'s Workspace`;
 const createWorkspaceForUser = async (user) => {
     const workspace = await Workspace.create({
         name: buildWorkspaceName(user.name),
-        owner: user._id
+        owner: user._id,
+        members: [user._id]
     });
 
     user.workspaceId = workspace._id;
+    user.teamId = workspace._id;
     await user.save();
 
     return workspace;
@@ -45,7 +47,7 @@ const syncWorkspaceData = async (ownerId, workspaceId) => {
                     }
                 ]
             },
-            { $set: { workspaceId } }
+            { $set: { workspaceId, teamId: workspaceId } }
         ),
         TeamMember.updateMany(
             {
@@ -54,7 +56,7 @@ const syncWorkspaceData = async (ownerId, workspaceId) => {
                     { managerId: ownerId }
                 ]
             },
-            { $set: { workspaceId } }
+            { $set: { workspaceId, teamId: workspaceId } }
         ),
         Project.updateMany(
             {
@@ -106,9 +108,14 @@ const ensureWorkspaceForOwner = async (user) => {
         workspace = await createWorkspaceForUser(user);
     } else if (!user.workspaceId || user.workspaceId.toString() !== workspace._id.toString()) {
         user.workspaceId = workspace._id;
+        user.teamId = workspace._id;
+        await user.save();
+    } else if (!user.teamId || user.teamId.toString() !== workspace._id.toString()) {
+        user.teamId = workspace._id;
         await user.save();
     }
 
+    await Workspace.findByIdAndUpdate(workspace._id, { $addToSet: { members: user._id } });
     await syncWorkspaceData(user._id, workspace._id);
 
     return user;
@@ -135,7 +142,9 @@ const ensureWorkspaceForUser = async (user) => {
     const ensuredManager = await ensureWorkspaceForOwner(manager);
     if (ensuredManager.workspaceId) {
         user.workspaceId = ensuredManager.workspaceId;
+        user.teamId = ensuredManager.workspaceId;
         await user.save();
+        await Workspace.findByIdAndUpdate(ensuredManager.workspaceId, { $addToSet: { members: user._id } });
     }
 
     return user;

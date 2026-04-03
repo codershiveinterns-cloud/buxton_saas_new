@@ -12,6 +12,10 @@ const DocumentSchema = new mongoose.Schema({
     fileType: {
         type: String, // doc, pdf, image
     },
+    fileSizeBytes: {
+        type: Number,
+        default: 0
+    },
     fileUrl: {
         type: String,
         required: [true, 'Please provide a file URL']

@@ -194,11 +194,12 @@ export default function Contact() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   Email
                 </h3>
+                <p className="mb-2 text-sm text-gray-500">For support</p>
                 <a
-                  href="mailto:ravirana@zentivoratech.com"
+                  href="mailto:tusharpalaria2@gmail.com"
                   className="text-gray-500 transition-colors hover:text-gray-800"
                 >
-                  ravirana@zentivoratech.com
+                  tusharpalaria2@gmail.com
                 </a>
               </div>
 

@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import AppShell from '../components/AppShell';
+import UpgradePrompt from '../components/UpgradePrompt';
+import { usePlan } from '../context/PlanContext';
 import api from '../lib/api';
 import toast from 'react-hot-toast';
+import { formatStorage, getPlanLabel, hasFeatureAccess } from '../utils/planUtils';
+import { isManagerRole } from '../utils/roleUtils';
 
 export default function Settings() {
+  const { planSnapshot } = usePlan();
   const [user, setUser] = useState<any>(null);
   
   // Profile state
@@ -20,7 +26,7 @@ export default function Settings() {
   const [companyName, setCompanyName] = useState('ZENTIVORA TECHNOLOGIES LTD');
   const [companyAddress, setCompanyAddress] = useState('28, City Road, London, EC1V 2NX, United Kingdom');
 
-  const isManager = user?.role !== 'member';
+  const isManager = isManagerRole(user?.role);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -79,6 +85,38 @@ export default function Settings() {
           </div>
 
           <div className="space-y-8">
+            <div className="rounded-xl border border-[#E5DED6] bg-white p-4 shadow-sm sm:p-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h2 className="mb-2 text-xl font-bold text-[#1F2937]">Plan & Access</h2>
+                  <p className="text-sm text-[#6B7280]">
+                    Current plan: {getPlanLabel(planSnapshot?.plan?.name)}. Team seats: {planSnapshot?.usage.teamMembersUsed ?? 0} / {planSnapshot?.limits?.teamMembers ?? 'Unlimited'}.
+                  </p>
+                  <p className="mt-1 text-sm text-[#6B7280]">
+                    Storage: {formatStorage(planSnapshot?.usage.storageUsedBytes ?? 0)} / {formatStorage(planSnapshot?.limits?.storageBytes ?? null)}
+                  </p>
+                </div>
+                {isManager ? (
+                  <Link
+                    to="/pricing"
+                    className="inline-flex items-center justify-center rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8]"
+                  >
+                    Upgrade Plan
+                  </Link>
+                ) : null}
+              </div>
+
+              {!hasFeatureAccess(planSnapshot, 'advanced') && isManager && (
+                <div className="mt-4">
+                  <UpgradePrompt
+                    compact
+                    title="Advanced collaboration is locked"
+                    message="Upgrade to Professional or Premium Plus to unlock meetings and private notes."
+                  />
+                </div>
+              )}
+            </div>
+
             {/* Profile Settings */}
             <div className="rounded-xl border border-[#E5DED6] bg-white p-4 shadow-sm sm:p-6">
               <h2 className="text-xl font-bold text-[#1F2937] mb-4">Profile Information</h2>

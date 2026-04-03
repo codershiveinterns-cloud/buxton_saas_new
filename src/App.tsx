@@ -28,6 +28,7 @@ import Pricing from './pages/Pricing';
 import Careers from './pages/Careers';
 import Blog from './pages/Blog';
 import HelpCenter from './pages/HelpCenter';
+import Invite from './pages/Invite';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
         <Route path="/privacy" element={<Policy />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/invite" element={<Invite />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         
         {/* Protected Routes */}

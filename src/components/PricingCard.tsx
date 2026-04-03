@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
 
 interface PricingCardProps {
@@ -47,15 +48,16 @@ export default function PricingCard({
         </div>
         <p className="text-gray-500 text-sm">{description}</p>
       </div>
-      <button
-        className={`w-full py-3 px-6 rounded-lg font-medium transition-colors mb-6 ${
+      <Link
+        to="/pricing"
+        className={`block w-full rounded-lg px-6 py-3 text-center font-medium transition-colors mb-6 ${
           popular
             ? 'bg-indigo-600 text-white hover:bg-indigo-700'
             : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
         }`}
       >
         Get Started
-      </button>
+      </Link>
       <ul className="space-y-3">
         {features.map((feature, index) => (
           <li key={index} className="flex items-start">

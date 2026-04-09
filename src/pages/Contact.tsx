@@ -230,10 +230,6 @@ export default function Contact() {
                   United Kingdom
                 </p>
               </div>
-
-              <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl aspect-video flex items-center justify-center">
-                <MapPin className="w-12 h-12 text-gray-400" />
-              </div>
             </div>
           </div>
         </div>

@@ -11,6 +11,7 @@ import type { BillingCycle, PlanName, PlanSnapshot } from '../types/plan';
 import {
   cachePlanSnapshot,
   clearAllPlanStorage,
+  clearCachedPlanSnapshot,
   getCachedPlanSnapshot,
   getStoredUserId,
   getUserPlan,
@@ -33,6 +34,20 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(Boolean(localStorage.getItem('token') && getStoredUserId()));
   const [isSaving, setIsSaving] = useState(false);
 
+  const hasPendingApproval = () => {
+    const userJson = localStorage.getItem('user');
+    if (!userJson) {
+      return false;
+    }
+
+    try {
+      const storedUser = JSON.parse(userJson);
+      return Boolean(storedUser?.requiresApproval && storedUser?.approvalStatus !== 'approved');
+    } catch {
+      return false;
+    }
+  };
+
   const clearPlan = useCallback(() => {
     setPlanSnapshot(null);
     clearAllPlanStorage();
@@ -47,14 +62,26 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       return null;
     }
 
+    if (hasPendingApproval()) {
+      setPlanSnapshot(null);
+      clearCachedPlanSnapshot();
+      return null;
+    }
+
     setIsLoading(true);
     try {
       const nextPlanSnapshot = await getUserPlan(userId);
       setPlanSnapshot(nextPlanSnapshot);
       cachePlanSnapshot(nextPlanSnapshot);
       return nextPlanSnapshot;
-    } catch {
-      clearPlan();
+    } catch (error) {
+      console.error('[PlanContext] Failed to refresh plan snapshot', error);
+      const cachedPlanSnapshot = getCachedPlanSnapshot();
+      if (cachedPlanSnapshot) {
+        setPlanSnapshot(cachedPlanSnapshot);
+        return cachedPlanSnapshot;
+      }
+
       return null;
     } finally {
       setIsLoading(false);
@@ -84,6 +111,13 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     if (!userId || !token) {
       setIsLoading(false);
       clearPlan();
+      return;
+    }
+
+    if (hasPendingApproval()) {
+      setIsLoading(false);
+      setPlanSnapshot(null);
+      clearCachedPlanSnapshot();
       return;
     }
 

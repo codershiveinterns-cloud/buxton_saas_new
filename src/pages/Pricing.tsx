@@ -1,22 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PlanSelectionCard from '../components/PlanSelectionCard';
 import { usePlan } from '../context/PlanContext';
-import { savePendingPlanSelection } from '../services/planService';
+import {
+  clearPendingPlanSelection,
+  getPendingPlanSelection,
+  savePendingPlanSelection,
+  submitOnboardingRequest,
+} from '../services/planService';
+import { authService } from '../services/authService';
 import type { BillingCycle, PlanName } from '../types/plan';
 import { PLAN_DEFINITIONS, formatPrice, getPlanLabel } from '../utils/planUtils';
 import { isManagerRole } from '../utils/roleUtils';
 
 export default function Pricing() {
   const navigate = useNavigate();
-  const { planSnapshot, selectPlan, isSaving } = usePlan();
+  const { planSnapshot, selectPlan, clearPlan, isLoading, isSaving } = usePlan();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
-  const [selectedPlanName, setSelectedPlanName] = useState<PlanName>('starter');
+  const [selectedPlanName, setSelectedPlanName] = useState<PlanName | null>(null);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
   const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') as string) : null;
   const isAuthenticatedNonManager = Boolean(user) && !isManagerRole(user?.role);
+  const pendingPlanSelection = useMemo(() => getPendingPlanSelection(), []);
+  const canSubmitApprovalRequest = Boolean(user?.requiresApproval && user?.approvalStatus === 'not_submitted');
+  const [onboardingForm, setOnboardingForm] = useState({
+    name: user?.name || '',
+    phone: user?.phone || '',
+    email: user?.email || '',
+    comment: '',
+  });
 
   useEffect(() => {
     if (isAuthenticatedNonManager) {
@@ -27,8 +43,22 @@ export default function Pricing() {
     if (planSnapshot?.plan) {
       setBillingCycle(planSnapshot.plan.billingCycle);
       setSelectedPlanName(planSnapshot.plan.name);
+      return;
     }
-  }, [isAuthenticatedNonManager, navigate, planSnapshot]);
+
+    if (!isLoading) {
+      setSelectedPlanName((currentPlanName) => currentPlanName ?? pendingPlanSelection?.planName ?? 'starter');
+      if (pendingPlanSelection?.billingCycle) {
+        setBillingCycle(pendingPlanSelection.billingCycle);
+      }
+    }
+  }, [isAuthenticatedNonManager, isLoading, navigate, pendingPlanSelection, planSnapshot]);
+
+  useEffect(() => {
+    if (canSubmitApprovalRequest && pendingPlanSelection?.planName) {
+      setShowOnboardingModal(true);
+    }
+  }, [canSubmitApprovalRequest, pendingPlanSelection]);
 
   const handlePlanSelection = async (planName: PlanName) => {
     setSelectedPlanName(planName);
@@ -43,12 +73,53 @@ export default function Pricing() {
       return;
     }
 
+    if (canSubmitApprovalRequest) {
+      savePendingPlanSelection({ planName, billingCycle });
+      setShowOnboardingModal(true);
+      return;
+    }
+
     try {
       await selectPlan(planName, billingCycle);
       toast.success(`${getPlanLabel(planName)} plan activated`);
       navigate('/dashboard');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to activate the selected plan');
+    }
+  };
+
+  const handleOnboardingSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!selectedPlanName) {
+      toast.error('Please select a plan to continue.');
+      return;
+    }
+
+    if (!onboardingForm.name.trim() || !onboardingForm.phone.trim() || !onboardingForm.email.trim() || !onboardingForm.comment.trim()) {
+      toast.error('Please complete all onboarding details.');
+      return;
+    }
+
+    setIsSubmittingRequest(true);
+    try {
+      await submitOnboardingRequest({
+        planName: selectedPlanName,
+        billingCycle,
+        name: onboardingForm.name.trim(),
+        phone: onboardingForm.phone.trim(),
+        email: onboardingForm.email.trim(),
+        comment: onboardingForm.comment.trim(),
+      });
+      clearPendingPlanSelection();
+      clearPlan();
+      await authService.logout();
+      toast.success('Your account is under review. Please wait for approval.');
+      navigate('/login', { replace: true });
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to submit your approval request');
+    } finally {
+      setIsSubmittingRequest(false);
     }
   };
 
@@ -69,8 +140,7 @@ export default function Pricing() {
                 Pick the workspace plan that fits your team today
               </h1>
               <p className="mt-5 text-base leading-7 text-[#6B7280] sm:text-lg">
-                Choose a plan, enter the app immediately, and unlock features based on that plan.
-                The yearly switch is visual only for now and shows a 20% discount.
+                Choose the plan that fits your workspace. New self-serve accounts will submit their details for admin review before access is enabled.
               </p>
             </div>
 
@@ -106,6 +176,12 @@ export default function Pricing() {
                   Current plan: <span className="font-semibold text-[#1F2937]">{planSnapshot.plan.label}</span>
                 </div>
               )}
+
+              {canSubmitApprovalRequest && (
+                <div className="rounded-2xl border border-[#D7C7B3] bg-[#FFF7ED] px-5 py-4 text-sm text-[#6B7280]">
+                  Select a plan and submit your onboarding details. Access will be enabled after an admin approves your request.
+                </div>
+              )}
             </div>
           </section>
 
@@ -128,7 +204,7 @@ export default function Pricing() {
                   popular={planName === 'professional'}
                   isCurrent={isCurrent}
                   isSelected={isSelected}
-                  isLoading={isSaving}
+                  isLoading={isSaving || isSubmittingRequest}
                   ctaLabel={isCurrent ? 'Current Plan' : 'Get Started'}
                   onSelect={() => handlePlanSelection(planName)}
                 />
@@ -137,6 +213,86 @@ export default function Pricing() {
           </section>
         </div>
       </main>
+
+      {showOnboardingModal && selectedPlanName && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[28px] border border-[#E5DED6] bg-white p-6 shadow-xl sm:p-8">
+            <div className="mb-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#2563EB]">Approval Request</p>
+              <h2 className="mt-2 text-2xl font-bold text-[#1F2937]">Submit your onboarding details</h2>
+              <p className="mt-2 text-sm text-[#6B7280]">
+                Selected plan: <span className="font-semibold text-[#1F2937]">{getPlanLabel(selectedPlanName)}</span> ({billingCycle === 'yearly' ? 'Yearly' : 'Monthly'})
+              </p>
+            </div>
+
+            <form onSubmit={handleOnboardingSubmit} className="space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#1F2937]">Name</label>
+                <input
+                  type="text"
+                  value={onboardingForm.name}
+                  onChange={(event) => setOnboardingForm((current) => ({ ...current, name: event.target.value }))}
+                  className="w-full rounded-xl border border-[#E5DED6] px-4 py-3 outline-none transition focus:ring-2 focus:ring-[#2563EB]"
+                  placeholder="Your full name"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#1F2937]">Phone Number</label>
+                <input
+                  type="text"
+                  value={onboardingForm.phone}
+                  onChange={(event) => setOnboardingForm((current) => ({ ...current, phone: event.target.value }))}
+                  className="w-full rounded-xl border border-[#E5DED6] px-4 py-3 outline-none transition focus:ring-2 focus:ring-[#2563EB]"
+                  placeholder="Your phone number"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#1F2937]">Email</label>
+                <input
+                  type="email"
+                  value={onboardingForm.email}
+                  onChange={(event) => setOnboardingForm((current) => ({ ...current, email: event.target.value }))}
+                  className="w-full rounded-xl border border-[#E5DED6] bg-[#F9F7F3] px-4 py-3 text-[#6B7280] outline-none"
+                  readOnly
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#1F2937]">Comment</label>
+                <textarea
+                  value={onboardingForm.comment}
+                  onChange={(event) => setOnboardingForm((current) => ({ ...current, comment: event.target.value }))}
+                  className="min-h-28 w-full rounded-xl border border-[#E5DED6] px-4 py-3 outline-none transition focus:ring-2 focus:ring-[#2563EB]"
+                  placeholder="Tell the admin a bit about your team, use case, or onboarding needs"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowOnboardingModal(false)}
+                  className="rounded-xl px-4 py-3 text-[#6B7280] transition hover:bg-[#EFE9E1]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingRequest}
+                  className="rounded-xl bg-[#2563EB] px-5 py-3 font-medium text-white transition hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:bg-[#A5B4D4]"
+                >
+                  {isSubmittingRequest ? 'Submitting...' : 'Submit for approval'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

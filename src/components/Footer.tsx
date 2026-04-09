@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Hammer, Instagram, Linkedin, Github } from 'lucide-react';
+import { Hammer, Instagram, Linkedin } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -36,12 +36,6 @@ export default function Footer() {
                 className="text-gray-400 hover:text-gray-800 transition-colors"
               >
                 <Linkedin className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="text-gray-400 hover:text-gray-800 transition-colors"
-              >
-                <Github className="w-5 h-5" />
               </a>
             </div>
           </div>

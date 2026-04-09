@@ -10,16 +10,47 @@ const isWorkspaceOwnerRole = (role) => ['Admin', 'Manager', 'manager'].includes(
 
 const buildWorkspaceName = (name) => `${name}'s Workspace`;
 
+const ensureUserDocument = async (userOrId) => {
+    if (!userOrId) {
+        return null;
+    }
+
+    if (typeof userOrId === 'string') {
+        return User.findById(userOrId);
+    }
+
+    if (typeof userOrId.save === 'function') {
+        return userOrId;
+    }
+
+    if (userOrId._id) {
+        const hydratedUser = await User.findById(userOrId._id);
+        if (hydratedUser) {
+            console.log('[workspace] Rehydrated plain user object into Mongoose document', {
+                userId: userOrId._id.toString()
+            });
+        }
+        return hydratedUser;
+    }
+
+    return null;
+};
+
 const createWorkspaceForUser = async (user) => {
+    const userDocument = await ensureUserDocument(user);
+    if (!userDocument) {
+        throw new Error('User not found while creating workspace');
+    }
+
     const workspace = await Workspace.create({
-        name: buildWorkspaceName(user.name),
-        owner: user._id,
-        members: [user._id]
+        name: buildWorkspaceName(userDocument.name),
+        owner: userDocument._id,
+        members: [userDocument._id]
     });
 
-    user.workspaceId = workspace._id;
-    user.teamId = workspace._id;
-    await user.save();
+    userDocument.workspaceId = workspace._id;
+    userDocument.teamId = workspace._id;
+    await userDocument.save();
 
     return workspace;
 };
@@ -98,6 +129,13 @@ const syncWorkspaceData = async (ownerId, workspaceId) => {
 };
 
 const ensureWorkspaceForOwner = async (user) => {
+    user = await ensureUserDocument(user);
+    if (!user) {
+        const error = new Error('User not found');
+        error.statusCode = 404;
+        throw error;
+    }
+
     let workspace = user.workspaceId ? await Workspace.findById(user.workspaceId) : null;
 
     if (!workspace) {
@@ -122,6 +160,7 @@ const ensureWorkspaceForOwner = async (user) => {
 };
 
 const ensureWorkspaceForUser = async (user) => {
+    user = await ensureUserDocument(user);
     if (!user) {
         return null;
     }

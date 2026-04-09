@@ -3,13 +3,15 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Hammer, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 import toast from 'react-hot-toast';
+import { usePlan } from '../context/PlanContext';
 import { authService, inviteStorage } from '../services/authService';
-import { getUserPlan, syncPendingPlanSelection } from '../services/planService';
+import { cachePlanSnapshot, getUserPlan, syncPendingPlanSelection } from '../services/planService';
 import { clearPendingInviteToken } from '../services/inviteService';
 import { isManagerRole } from '../utils/roleUtils';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { refreshPlan } = usePlan();
   const [searchParams] = useSearchParams();
   const inviteToken = searchParams.get('inviteToken') || inviteStorage.get();
   const [formData, setFormData] = useState({
@@ -24,8 +26,14 @@ export default function Login() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showResendRequest, setShowResendRequest] = useState(false);
+  const [isResendingRequest, setIsResendingRequest] = useState(false);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const getApiErrorMessage = (err: any, fallback: string) =>
+    typeof err?.response?.data === 'string'
+      ? err.response.data
+      : err?.response?.data?.message || fallback;
 
   const validateForm = () => {
     let isValid = true;
@@ -50,17 +58,36 @@ export default function Login() {
     if (validateForm()) {
       setIsLoading(true);
       setErrors((prev) => ({ ...prev, general: '' }));
+      setShowResendRequest(false);
 
       try {
         const loginResponse = await authService.loginUser(formData.email, formData.password);
+        const loginPlanSnapshot = loginResponse.planDetails || null;
+        const requiresApproval = Boolean(loginResponse.user?.requiresApproval);
+        const approvalStatus = loginResponse.user?.approvalStatus;
+
+        if (!requiresApproval && loginPlanSnapshot) {
+          cachePlanSnapshot(loginPlanSnapshot);
+        }
+
         if (inviteToken) {
           inviteStorage.save(inviteToken);
           await authService.acceptInvite(inviteToken, loginResponse.token);
           clearPendingInviteToken();
         }
+
+        if (requiresApproval && approvalStatus === 'not_submitted') {
+          toast.success('Select a plan and submit your details to start the approval review.');
+          navigate('/pricing');
+          return;
+        }
+
         const pendingPlanSnapshot = await syncPendingPlanSelection(loginResponse.user.id);
         const currentPlanSnapshot =
-          pendingPlanSnapshot || (await getUserPlan(loginResponse.user.id).catch(() => null));
+          pendingPlanSnapshot ||
+          (await refreshPlan().catch(() => null)) ||
+          (await getUserPlan(loginResponse.user.id).catch(() => loginPlanSnapshot)) ||
+          loginPlanSnapshot;
         toast.success('Logged in successfully!');
         navigate(currentPlanSnapshot?.plan || !isManagerRole(loginResponse.user.role) ? '/dashboard' : '/pricing');
       } catch (err: any) {
@@ -68,6 +95,11 @@ export default function Login() {
         
         if (err.message === 'NOT_VERIFIED') {
           errorMessage = 'Please verify your email before accessing the dashboard.';
+        } else if (err.response?.data?.approvalStatus === 'pending') {
+          errorMessage = 'Your account is under review. Please wait for approval.';
+          setShowResendRequest(true);
+        } else if (err.response?.data?.approvalStatus === 'rejected') {
+          errorMessage = 'Your access request has been rejected.';
         } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
           errorMessage = 'Invalid email or password.';
         }
@@ -80,6 +112,23 @@ export default function Login() {
       } finally {
         setIsLoading(false);
       }
+    }
+  };
+
+  const handleResendRequest = async () => {
+    if (!formData.email.trim()) {
+      setErrors((prev) => ({ ...prev, email: 'Email is required' }));
+      return;
+    }
+
+    setIsResendingRequest(true);
+    try {
+      await authService.resendOnboardingRequest(formData.email.trim());
+      toast.success('Request sent again successfully.');
+    } catch (err: any) {
+      toast.error(getApiErrorMessage(err, 'Failed to resend onboarding request'));
+    } finally {
+      setIsResendingRequest(false);
     }
   };
 
@@ -110,6 +159,22 @@ export default function Login() {
           {errors.general && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 font-medium">
               {errors.general}
+            </div>
+          )}
+
+          {showResendRequest && (
+            <div className="mb-6 rounded-lg border border-[#D7C7B3] bg-[#FFF7ED] p-4">
+              <p className="text-sm font-medium text-[#6B7280]">
+                If the approval email was missed, you can send it again to the admin.
+              </p>
+              <button
+                type="button"
+                onClick={handleResendRequest}
+                disabled={isResendingRequest}
+                className="mt-3 inline-flex items-center justify-center rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1D4ED8] disabled:cursor-not-allowed disabled:bg-[#A5B4D4]"
+              >
+                {isResendingRequest ? 'Sending...' : 'Resend Request'}
+              </button>
             </div>
           )}
           

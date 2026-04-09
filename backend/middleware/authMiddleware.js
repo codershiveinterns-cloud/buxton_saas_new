@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { ensureWorkspaceForUser } = require('../utils/workspace');
+const { APPROVAL_STATUS, getApprovalMessage, getApprovalStatus } = require('../utils/userApproval');
 
 module.exports = async function (req, res, next) {
     // Get token from header
@@ -19,6 +20,17 @@ module.exports = async function (req, res, next) {
             return res.status(401).json({ message: 'Token is not valid' });
         }
         user = await ensureWorkspaceForUser(user);
+        const approvalStatus = getApprovalStatus(user);
+        const isOnboardingRequestRoute = req.originalUrl?.startsWith('/api/plans/onboarding-request');
+
+        if (approvalStatus !== APPROVAL_STATUS.APPROVED && !isOnboardingRequestRoute) {
+            return res.status(403).json({
+                message: getApprovalMessage(approvalStatus),
+                approvalStatus,
+                requiresApproval: Boolean(user.requiresApproval)
+            });
+        }
+
         req.user = user;
         next();
     } catch (err) {

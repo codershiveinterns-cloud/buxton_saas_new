@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const TeamMember = require('../models/TeamMember');
 const { createWorkspaceForUser, ensureWorkspaceForUser } = require('../utils/workspace');
 const { getValidInviteByToken, acceptInviteForUser } = require('../services/inviteService');
+const { checkUserPlan } = require('../services/planService');
+const { APPROVAL_STATUS, getApprovalMessage, getApprovalStatus } = require('../utils/userApproval');
 
 exports.signup = async (req, res) => {
     const { name, email, firebaseUid, inviteToken } = req.body;
@@ -33,6 +35,8 @@ exports.signup = async (req, res) => {
                     user.workspaceId = invite.teamId._id;
                     user.teamId = invite.teamId._id;
                 }
+                user.requiresApproval = false;
+                user.approvalStatus = APPROVAL_STATUS.APPROVED;
                 await user.save();
 
                 if (invite) {
@@ -59,7 +63,9 @@ exports.signup = async (req, res) => {
             managerId: invite?.managerId?._id,
             workspaceId: invite?.teamId?._id,
             teamId: invite?.teamId?._id,
-            status: 'active'
+            status: 'active',
+            requiresApproval: !invite,
+            approvalStatus: invite ? APPROVAL_STATUS.APPROVED : APPROVAL_STATUS.NOT_SUBMITTED
         });
 
         await user.save();
@@ -122,7 +128,30 @@ exports.login = async (req, res) => {
 
         user = await ensureWorkspaceForUser(user);
 
-        // Once Firebase authentication via the frontend passes, generate backend app JWT
+        const approvalStatus = getApprovalStatus(user);
+        if (approvalStatus === APPROVAL_STATUS.PENDING || approvalStatus === APPROVAL_STATUS.REJECTED) {
+            return res.status(403).json({
+                message: getApprovalMessage(approvalStatus),
+                approvalStatus,
+                requiresApproval: Boolean(user.requiresApproval)
+            });
+        }
+
+        const planSnapshot = await checkUserPlan(user._id);
+
+        console.log('[auth/login] Fetched user data', {
+            userId: user._id.toString(),
+            email: user.email,
+            role: user.role,
+            managerId: user.managerId?.toString?.() || null,
+            workspaceId: user.workspaceId?.toString?.() || null,
+            teamId: user.teamId?.toString?.() || null,
+            storedPlanName: user.planName || null,
+            storedBillingCycle: user.billingCycle || null,
+            effectivePlanName: planSnapshot.plan?.name || null,
+            effectiveBillingCycle: planSnapshot.plan?.billingCycle || null
+        });
+
         const payload = {
             user: {
                 id: user.id
@@ -142,11 +171,16 @@ exports.login = async (req, res) => {
                         name: user.name,
                         email: user.email,
                         role: user.role,
-                        managerId: user.managerId,
-                        teamId: user.teamId || user.workspaceId,
-                        workspaceId: user.workspaceId,
-                        firebaseUid: user.firebaseUid
-                    }
+                        planName: planSnapshot.plan?.name || null,
+                        billingCycle: planSnapshot.plan?.billingCycle || null,
+                        managerId: user.managerId || planSnapshot.managerId || null,
+                        teamId: user.teamId || user.workspaceId || planSnapshot.teamId || null,
+                        workspaceId: user.workspaceId || planSnapshot.teamId || null,
+                        firebaseUid: user.firebaseUid,
+                        requiresApproval: Boolean(user.requiresApproval),
+                        approvalStatus
+                    },
+                    planDetails: planSnapshot
                 });
             }
         );

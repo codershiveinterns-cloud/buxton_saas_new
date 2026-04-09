@@ -46,6 +46,43 @@ const UserSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
+    requiresApproval: {
+        type: Boolean,
+        default: false
+    },
+    approvalStatus: {
+        type: String,
+        enum: ['not_submitted', 'pending', 'approved', 'rejected'],
+        default: 'approved'
+    },
+    approvalRequestedAt: {
+        type: Date,
+        default: null
+    },
+    approvalReviewedAt: {
+        type: Date,
+        default: null
+    },
+    approvalReviewedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
+    requestedPlanName: {
+        type: String,
+        enum: ['starter', 'professional', 'premium_plus'],
+        default: null
+    },
+    requestedBillingCycle: {
+        type: String,
+        enum: ['monthly', 'yearly'],
+        default: 'monthly'
+    },
+    requestedComment: {
+        type: String,
+        trim: true,
+        default: ''
+    },
     isVerified: {
         type: Boolean,
         default: false
@@ -58,6 +95,16 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['invited', 'active'],
         default: 'active'
+    },
+    planName: {
+        type: String,
+        enum: ['starter', 'professional', 'premium_plus'],
+        default: null
+    },
+    billingCycle: {
+        type: String,
+        enum: ['monthly', 'yearly'],
+        default: 'monthly'
     },
     createdAt: {
         type: Date,

@@ -61,24 +61,45 @@ const buildFeatureFlags = (planName: PlanName | null): PlanFeatureFlags => {
   return baseFlags;
 };
 
+const normalizeBillingCycle = (billingCycle: unknown): BillingCycle =>
+  billingCycle === 'yearly' ? 'yearly' : 'monthly';
+
+const updateStoredUserPlan = (planSnapshot: PlanSnapshot | null) => {
+  const currentUser = getStoredUser();
+  if (!currentUser) {
+    return;
+  }
+
+  const nextUser = {
+    ...currentUser,
+    planName: planSnapshot?.plan?.name ?? null,
+    billingCycle: planSnapshot?.plan?.billingCycle ?? null,
+    managerId: planSnapshot?.managerId ?? currentUser.managerId ?? null,
+  };
+
+  localStorage.setItem('user', JSON.stringify(nextUser));
+};
+
 const buildFallbackSnapshot = (
   userId: string,
   role: string | null,
-  planName: PlanName | null
+  planName: PlanName | null,
+  billingCycle: BillingCycle | null,
+  managerId: string | null
 ): PlanSnapshot => {
   const planDefinition = planName ? PLAN_DEFINITIONS[planName] : null;
 
   return {
     userId,
     teamId: null,
-    managerId: null,
+    managerId,
     plan: planDefinition
       ? {
           id: `${userId}-${planName}`,
           name: planDefinition.name,
           label: planDefinition.label,
           planStatus: 'active',
-          billingCycle: 'monthly',
+          billingCycle: normalizeBillingCycle(billingCycle),
         }
       : null,
     usage: {
@@ -123,8 +144,11 @@ const normalizePlanResponse = (userId: string, responseData: any): PlanSnapshot 
   }
 
   const currentUser = getStoredUser();
-  const planName = (responseData?.plan || null) as PlanName | null;
-  return buildFallbackSnapshot(userId, currentUser?.role || null, planName);
+  const planName = (responseData?.plan ?? currentUser?.planName ?? null) as PlanName | null;
+  const billingCycle = (responseData?.billingCycle ?? currentUser?.billingCycle ?? null) as BillingCycle | null;
+  const managerId = (responseData?.managerId ?? currentUser?.managerId ?? null) as string | null;
+
+  return buildFallbackSnapshot(userId, currentUser?.role || null, planName, billingCycle, managerId);
 };
 
 export const getCachedPlanSnapshot = () => parseStoredJson<PlanSnapshot>(PLAN_CACHE_KEY);
@@ -136,6 +160,7 @@ export const cachePlanSnapshot = (planSnapshot: PlanSnapshot | null) => {
   }
 
   localStorage.setItem(PLAN_CACHE_KEY, JSON.stringify(planSnapshot));
+  updateStoredUserPlan(planSnapshot);
 };
 
 export const clearCachedPlanSnapshot = () => {
@@ -173,6 +198,37 @@ export const selectPlan = async (
   cachePlanSnapshot(planSnapshot);
   clearPendingPlanSelection();
   return planSnapshot;
+};
+
+export const submitOnboardingRequest = async ({
+  planName,
+  billingCycle,
+  name,
+  phone,
+  email,
+  comment,
+}: {
+  planName: PlanName;
+  billingCycle: BillingCycle;
+  name: string;
+  phone: string;
+  email: string;
+  comment: string;
+}) => {
+  const response = await api.post(
+    '/plans/onboarding-request',
+    {
+      plan: planName,
+      billingCycle,
+      name,
+      phone,
+      email,
+      comment,
+    },
+    getAuthConfig()
+  );
+
+  return response.data;
 };
 
 export async function getUserPlan(userId: string): Promise<PlanSnapshot> {

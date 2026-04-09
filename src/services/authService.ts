@@ -88,6 +88,14 @@ export const authService = {
     return await sendPasswordResetEmail(auth, email);
   },
 
+  async resendOnboardingRequest(email: string) {
+    const response = await api.post('/plans/resend-onboarding-request', {
+      email
+    });
+
+    return response.data;
+  },
+
   async inviteTeamMember(email: string, name: string, phone: string, managerToken: string) {
     try {
       // Create team member strictly in our backend - Firebase account is dynamically generated upon Signup link acceptance

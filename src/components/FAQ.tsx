@@ -8,11 +8,6 @@ const faqs = [
       'Zentivora Workspace is a cloud-based productivity and collaboration platform designed for modern teams to organize documents, manage projects, and track tasks all in one unified interface.',
   },
   {
-    question: 'Is there a free trial?',
-    answer:
-      'Yes, we offer a 14-day free trial on all our plans. No credit card is required to sign up and start exploring the platform.',
-  },
-  {
     question: 'Can I invite team members?',
     answer:
       'Absolutely! Depending on your plan, you can easily invite team members via email and set specific role-based access permissions.',

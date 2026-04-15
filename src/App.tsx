@@ -27,7 +27,9 @@ import Features from './pages/Features';
 import Pricing from './pages/Pricing';
 import Careers from './pages/Careers';
 import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import HelpCenter from './pages/HelpCenter';
+import HelpArticle from './pages/HelpArticle';
 import Invite from './pages/Invite';
 
 function App() {
@@ -42,7 +44,9 @@ function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/help" element={<HelpCenter />} />
+        <Route path="/help/article/:slug" element={<HelpArticle />} />
         <Route path="/policy" element={<Policy />} />
         <Route path="/privacy" element={<Policy />} />
         <Route path="/login" element={<Login />} />
